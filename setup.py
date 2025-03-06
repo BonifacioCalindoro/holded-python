@@ -18,7 +18,7 @@ requirements = [
 
 setup(
     name="holded-python",
-    version="0.1.0",
+    version="0.1.1",
     author="BonifacioCalindoro",
     author_email="marcos@marcosgimenez.tech",
     description="A comprehensive Python wrapper for the Holded API",
