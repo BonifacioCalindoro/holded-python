@@ -1,0 +1,15 @@
+include LICENSE
+include README.md
+include CHANGELOG.md
+include requirements.txt
+include pytest.ini
+include pyproject.toml
+include Makefile
+include CODE_OF_CONDUCT.md
+include CONTRIBUTING.md
+
+recursive-include docs *
+recursive-include examples *.py
+recursive-include tests *.py
+
+global-exclude *.py[cod] __pycache__ *.so .DS_Store 
