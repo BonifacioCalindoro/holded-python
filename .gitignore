@@ -4,3 +4,4 @@ __pycache__/
 dist/
 build/
 holded_python.egg-info/
+main.py

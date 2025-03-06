@@ -1,7 +1,7 @@
 """
 Models for the Employees API.
 """
-from datetime import datetime, date
+from datetime import datetime, date as date_type
 from typing import Any, Dict, List, Optional
 
 from pydantic import Field
@@ -36,8 +36,8 @@ class EmployeeCreate(BaseModel):
     phone: Optional[str] = Field(default=None, description="Employee phone")
     position: Optional[str] = Field(default=None, description="Employee position/job title")
     department: Optional[str] = Field(default=None, description="Employee department")
-    hire_date: Optional[date] = Field(default=None, description="Hire date")
-    birth_date: Optional[date] = Field(default=None, description="Birth date")
+    hire_date: Optional[date_type] = Field(default=None, description="Hire date")
+    birth_date: Optional[date_type] = Field(default=None, description="Birth date")
     tax_id: Optional[str] = Field(default=None, description="Tax ID/SSN")
     address: Optional[EmployeeAddress] = Field(default=None, description="Employee address")
     bank_account: Optional[EmployeeBankAccount] = Field(default=None, description="Bank account information")
@@ -55,8 +55,8 @@ class EmployeeUpdate(BaseModel):
     phone: Optional[str] = Field(default=None, description="Employee phone")
     position: Optional[str] = Field(default=None, description="Employee position/job title")
     department: Optional[str] = Field(default=None, description="Employee department")
-    hire_date: Optional[date] = Field(default=None, description="Hire date")
-    birth_date: Optional[date] = Field(default=None, description="Birth date")
+    hire_date: Optional[date_type] = Field(default=None, description="Hire date")
+    birth_date: Optional[date_type] = Field(default=None, description="Birth date")
     tax_id: Optional[str] = Field(default=None, description="Tax ID/SSN")
     address: Optional[EmployeeAddress] = Field(default=None, description="Employee address")
     bank_account: Optional[EmployeeBankAccount] = Field(default=None, description="Bank account information")
@@ -88,7 +88,7 @@ class PayrollCreate(BaseModel):
     
     employee_id: str = Field(..., description="Employee ID")
     period: str = Field(..., description="Payroll period (e.g., '2023-01')")
-    date: date = Field(..., description="Payroll date")
+    date: date_type = Field(..., description="Payroll date")
     base_salary: float = Field(..., description="Base salary amount")
     additions: Optional[List["PayrollAddition"]] = Field(default=None, description="Salary additions")
     deductions: Optional[List["PayrollDeduction"]] = Field(default=None, description="Salary deductions")
@@ -127,7 +127,7 @@ class PayrollUpdate(BaseModel):
     
     employee_id: Optional[str] = Field(default=None, description="Employee ID")
     period: Optional[str] = Field(default=None, description="Payroll period (e.g., '2023-01')")
-    date: Optional[date] = Field(default=None, description="Payroll date")
+    date: Optional[date_type] = Field(default=None, description="Payroll date")
     base_salary: Optional[float] = Field(default=None, description="Base salary amount")
     additions: Optional[List[PayrollAddition]] = Field(default=None, description="Salary additions")
     deductions: Optional[List[PayrollDeduction]] = Field(default=None, description="Salary deductions")
@@ -161,8 +161,8 @@ class TimeOffCreate(BaseModel):
     
     employee_id: str = Field(..., description="Employee ID")
     type: str = Field(..., description="Time off type (vacation, sick, etc.)")
-    start_date: date = Field(..., description="Start date")
-    end_date: date = Field(..., description="End date")
+    start_date: date_type = Field(..., description="Start date")
+    end_date: date_type = Field(..., description="End date")
     reason: Optional[str] = Field(default=None, description="Time off reason")
     notes: Optional[str] = Field(default=None, description="Time off notes")
     status: Optional[str] = Field(default=None, description="Time off status")
@@ -174,8 +174,8 @@ class TimeOffUpdate(BaseModel):
     
     employee_id: Optional[str] = Field(default=None, description="Employee ID")
     type: Optional[str] = Field(default=None, description="Time off type (vacation, sick, etc.)")
-    start_date: Optional[date] = Field(default=None, description="Start date")
-    end_date: Optional[date] = Field(default=None, description="End date")
+    start_date: Optional[date_type] = Field(default=None, description="Start date")
+    end_date: Optional[date_type] = Field(default=None, description="End date")
     reason: Optional[str] = Field(default=None, description="Time off reason")
     notes: Optional[str] = Field(default=None, description="Time off notes")
     status: Optional[str] = Field(default=None, description="Time off status")
@@ -204,7 +204,7 @@ class ExpenseCreate(BaseModel):
     """Model for creating an expense."""
     
     employee_id: str = Field(..., description="Employee ID")
-    date: date = Field(..., description="Expense date")
+    date: date_type = Field(..., description="Expense date")
     amount: float = Field(..., description="Expense amount")
     category: str = Field(..., description="Expense category")
     description: Optional[str] = Field(default=None, description="Expense description")
@@ -217,7 +217,7 @@ class ExpenseUpdate(BaseModel):
     """Model for updating an expense."""
     
     employee_id: Optional[str] = Field(default=None, description="Employee ID")
-    date: Optional[date] = Field(default=None, description="Expense date")
+    date: Optional[date_type] = Field(default=None, description="Expense date")
     amount: Optional[float] = Field(default=None, description="Expense amount")
     category: Optional[str] = Field(default=None, description="Expense category")
     description: Optional[str] = Field(default=None, description="Expense description")
@@ -301,4 +301,4 @@ class ExpenseListResponse(BaseResponse):
 
 
 # Fix forward references
-PayrollCreate.update_forward_refs() 
+PayrollCreate.model_rebuild() 
