@@ -1,214 +1,119 @@
 # Holded API Wrapper
 
-A comprehensive Python wrapper for the Holded API, providing both synchronous and asynchronous clients.
+A comprehensive Python wrapper for the Holded API, providing a clean, type-safe interface for interacting with Holded's services.
 
 **DISCLAIMER: This is an unofficial library for the Holded API. It is not affiliated with, officially maintained, or endorsed by Holded. The author(s) of this library are not responsible for any misuse or damage caused by using this code. Use at your own risk.**
 
 ## Features
 
-- Complete coverage of all Holded API endpoints (Invoice, CRM, Projects, Team, and Accounting)
-- Both synchronous and asynchronous clients
-- Type hints for better IDE support
-- Comprehensive error handling with specific exception classes
-- Pagination support for list endpoints
-- Pydantic data models for request and response validation
-- Detailed documentation for all methods
+- **Complete API Coverage**: Supports all Holded API endpoints across Invoice, CRM, Projects, Team, and Accounting services
+- **Type Safety**: Comprehensive Pydantic models for request and response validation
+- **Synchronous and Asynchronous**: Choose between synchronous and asynchronous clients based on your needs
+- **Pagination Handling**: Automatic pagination for list endpoints
+- **Error Handling**: Robust error handling with detailed exception hierarchy
+- **Rate Limiting**: Built-in rate limit handling with exponential backoff
 
 ## Installation
 
 ```bash
-pip install holded-python
+pip install holded-api
 ```
 
-## Usage
-
-### Synchronous API
+## Quick Start
 
 ```python
-from holded.client import HoldedClient
-from holded.models.contacts import ContactCreate
+import os
+from holded import HoldedClient
 
-# Initialize the client
-client = HoldedClient(api_key="your_api_key")
+# Initialize the client with your API key
+api_key = os.environ.get("HOLDED_API_KEY")
+client = HoldedClient(api_key=api_key)
 
 # List contacts
 contacts = client.contacts.list(limit=10)
+for contact in contacts.items:
+    print(f"Contact: {contact.name} ({contact.id})")
 
-# Create a contact
-contact_data = ContactCreate(
-    name="John Doe",
-    email="john.doe@example.com",
-    phone="123456789"
+# Create a new contact
+new_contact = client.contacts.create(
+    name="Acme Inc.",
+    email="info@acme.com",
+    type="client"
 )
-new_contact = client.contacts.create(contact_data)
+print(f"Created contact with ID: {new_contact.id}")
 
-# Get a specific contact
-contact = client.contacts.get("contact_id")
-
-# Update a contact
-client.contacts.update("contact_id", {"name": "Jane Doe"})
-
-# Delete a contact
-client.contacts.delete("contact_id")
+# Create an invoice
+invoice = client.documents.create(
+    contact_id=new_contact.id,
+    type="invoice",
+    date="2023-01-01",
+    items=[
+        {
+            "name": "Product A",
+            "units": 2,
+            "price": 100
+        }
+    ]
+)
+print(f"Created invoice with ID: {invoice.id}")
 ```
 
-### Asynchronous API
+## Asynchronous Usage
 
 ```python
 import asyncio
-from holded.async_client import AsyncHoldedClient
-from holded.models.contacts import ContactCreate
+import os
+from holded import AsyncHoldedClient
 
 async def main():
-    # Initialize the client
-    client = AsyncHoldedClient(api_key="your_api_key")
-
+    api_key = os.environ.get("HOLDED_API_KEY")
+    client = AsyncHoldedClient(api_key=api_key)
+    
     # List contacts
     contacts = await client.contacts.list(limit=10)
-
-    # Create a contact
-    contact_data = ContactCreate(
-        name="John Doe",
-        email="john.doe@example.com",
-        phone="123456789"
-    )
-    new_contact = await client.contacts.create(contact_data)
-
-    # Get a specific contact
-    contact = await client.contacts.get("contact_id")
-
-    # Update a contact
-    await client.contacts.update("contact_id", {"name": "Jane Doe"})
-
-    # Delete a contact
-    await client.contacts.delete("contact_id")
-
-    # Close the client session
+    for contact in contacts.items:
+        print(f"Contact: {contact.name} ({contact.id})")
+    
+    # Don't forget to close the client
     await client.close()
 
-# Run the async function
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
-## API Categories Covered
+## Enhanced Data Models
 
-### Invoice API
-- **Contacts**: Manage clients and providers
-- **Documents**: Handle invoices, orders, quotes, delivery notes, etc.
-- **Products**: Manage product catalog, categories, and variants
-- **Warehouses**: Control inventory locations and stock
-- **Treasury**: Manage financial accounts and transactions
-- **Taxes**: Configure tax rates and rules
-- **Payments**: Process and track payments
-- **Contact Groups**: Organize contacts into groups
-- **Services**: Manage service offerings
-- **Expense Accounts**: Track expense categories
-- **Numbering Series**: Set up document numbering
-- **Sales Channels**: Configure sales channels
-- **Remittances**: Handle remittance documents
+The wrapper includes comprehensive data models for all Holded API resources:
 
-### CRM API
-- **Funnels**: Set up and manage sales funnels
-- **Leads**: Track and manage sales leads
-- **Events**: Schedule and manage events
-- **Bookings**: Handle booking locations and appointments
+### Base Models
 
-### Projects API
-- **Projects**: Create and manage projects
-- **Tasks**: Assign and track project tasks
-- **Time Tracking**: Log time spent on projects
+- `BaseModel`: Foundation for all models with Pydantic configuration
+- `BaseResponse`: Common response structure
+- `PaginationParams`: Parameters for paginated endpoints
+- `DateRangeParams`: Parameters for date filtering
+- `SortParams`: Parameters for sorting results
+- `ErrorResponse`: Structure for API errors
 
-### Team API
-- **Employees**: Manage employee records
-- **Time Tracking**: Track employee time and attendance
+### Resource-Specific Models
 
-### Accounting API
-- **Daily Ledger**: Record and manage accounting entries
-- **Chart of Accounts**: Manage accounting account structure
-
-## Data Models
-
-The library includes Pydantic models for all API requests and responses, providing:
-
-- Type validation and enforcement
-- Automatic serialization/deserialization
-- Clear documentation through type hints and descriptions
-- Consistent structure for all API interactions
-- Proper handling of optional and required fields
-
-Example of using models:
-
-```python
-from holded.models.contacts import ContactCreate, ContactListParams
-from holded.client import HoldedClient
-
-client = HoldedClient(api_key="your_api_key")
-
-# Create a contact with validated data
-contact_data = ContactCreate(
-    name="John Doe",
-    email="john.doe@example.com",
-    phone="123456789"
-)
-new_contact = client.contacts.create(contact_data)
-
-# List contacts with pagination parameters
-params = ContactListParams(page=1, limit=25, type="client")
-contacts = client.contacts.list(params)
-```
-
-## Error Handling
-
-The library provides specific exception classes for different types of errors:
-
-```python
-from holded.client import HoldedClient
-from holded.exceptions import HoldedAuthError, HoldedNotFoundError, HoldedValidationError, HoldedRateLimitError, HoldedServerError
-
-client = HoldedClient(api_key="your_api_key")
-
-try:
-    contact = client.contacts.get("non_existent_id")
-except HoldedAuthError:
-    print("Authentication failed. Check your API key.")
-except HoldedNotFoundError:
-    print("Contact not found.")
-except HoldedValidationError as e:
-    print(f"Validation error: {e}")
-except HoldedRateLimitError:
-    print("Rate limit exceeded. Please try again later.")
-except HoldedServerError:
-    print("Holded server error. Please try again later.")
-```
-
-## Authentication
-
-The Holded API uses API keys for authentication. To generate an API key:
-
-1. Log in to your Holded account
-2. Go to Menu > Settings > Developers
-3. Click "+ New API Key"
-4. Enter a name/description for the key
-5. Click Save
-6. Copy the generated alphanumeric code
-
-Include this API key when initializing the client:
-
-```python
-client = HoldedClient(api_key="your_api_key")
-```
-
-## Rate Limiting
-
-The Holded API may have rate limits. The wrapper handles rate limit errors by raising a `HoldedRateLimitError` exception. You can implement retry logic in your application to handle these errors.
+- **Contacts**: Contact management with address, bank account, and tax information
+- **Documents**: Invoices, estimates, orders, and other document types
+- **Products**: Product catalog with variants, categories, and stock management
+- **CRM**: Leads, funnels, tasks, and notes
+- **Treasury**: Accounts, transactions, and categories
+- **Projects**: Project management, tasks, and time tracking
+- **Accounting**: Journal entries, accounts, and financial reports
+- **Team**: Employee management and permissions
 
 ## Documentation
 
-For more detailed documentation, see the [docs](https://github.com/BonifacioCalindoro/holded-python/tree/main/docs) directory.
+For more detailed documentation, see:
 
-## Examples
-
-For examples of how to use the library, see the [examples](https://github.com/BonifacioCalindoro/holded-python/tree/main/examples) directory.
+- [Getting Started](docs/getting_started.md)
+- [API Reference](docs/api_reference/index.md)
+- [Examples](docs/examples.md)
+- [Advanced Usage](docs/advanced_usage.md)
+- [Error Handling](docs/error_handling.md)
 
 ## Contributing
 
@@ -216,4 +121,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT 
+This project is licensed under the MIT License - see the LICENSE file for details. 

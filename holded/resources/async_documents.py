@@ -11,17 +11,27 @@ class AsyncDocumentsResource(AsyncBaseResource):
     Resource for interacting with the Documents API asynchronously.
     """
 
-    async def list(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    def __init__(self, client):
+        """Initialize the documents resource.
+
+        Args:
+            client: The Holded async client instance.
+        """
+        self.client = client
+        self.base_path = "invoicing/documents"
+
+    async def list(self, docType: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all documents asynchronously.
 
         Args:
+            docType: The document type
             params: Optional query parameters (e.g., page, limit, type)
 
         Returns:
             A list of documents
         """
-        result = await self.client.get("invoicing", "documents", params=params)
+        result = await self.client.get(f"{self.base_path}/{docType}", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -34,7 +44,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The created document
         """
-        result = await self.client.post("invoicing", "documents", data)
+        result = await self.client.post(self.base_path, data=data)
         return cast(Dict[str, Any], result)
 
     async def get(self, document_id: str) -> Dict[str, Any]:
@@ -47,7 +57,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The document details
         """
-        result = await self.client.get("invoicing", "documents", document_id)
+        result = await self.client.get(f"{self.base_path}/{document_id}")
         return cast(Dict[str, Any], result)
 
     async def update(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -61,7 +71,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The updated document
         """
-        result = await self.client.put("invoicing", "documents", document_id, data)
+        result = await self.client.put(f"{self.base_path}/{document_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete(self, document_id: str) -> Dict[str, Any]:
@@ -74,7 +84,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The deletion response
         """
-        result = await self.client.delete("invoicing", "documents", document_id)
+        result = await self.client.delete(f"{self.base_path}/{document_id}")
         return cast(Dict[str, Any], result)
 
     async def pay(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -88,7 +98,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The payment response
         """
-        result = await self.client.post("invoicing", f"documents/{document_id}/pay", data)
+        result = await self.client.post(f"{self.base_path}/{document_id}/pay", data=data)
         return cast(Dict[str, Any], result)
 
     async def send(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -102,7 +112,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The send response
         """
-        result = await self.client.post("invoicing", f"documents/{document_id}/send", data)
+        result = await self.client.post(f"{self.base_path}/{document_id}/send", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_pdf(self, document_id: str) -> Dict[str, Any]:
@@ -115,7 +125,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The PDF data
         """
-        result = await self.client.get("invoicing", f"documents/{document_id}/pdf")
+        result = await self.client.get(f"{self.base_path}/{document_id}/pdf")
         return cast(Dict[str, Any], result)
 
     async def ship_all_items(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -129,7 +139,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The shipping response
         """
-        result = await self.client.post("invoicing", f"documents/{document_id}/shipall", data)
+        result = await self.client.post(f"invoicing/documents/{document_id}/shipall", data=data)
         return cast(Dict[str, Any], result)
 
     async def ship_items_by_line(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -143,7 +153,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The shipping response
         """
-        result = await self.client.post("invoicing", f"documents/{document_id}/shipline", data)
+        result = await self.client.post(f"invoicing/documents/{document_id}/shipline", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_shipped_units(self, document_id: str, item_id: str) -> Dict[str, Any]:
@@ -157,7 +167,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The shipped units data
         """
-        result = await self.client.get("invoicing", f"documents/{document_id}/shipped/{item_id}")
+        result = await self.client.get(f"invoicing/documents/{document_id}/shipped/{item_id}")
         return cast(Dict[str, Any], result)
 
     async def attach_file(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -171,7 +181,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The attachment response
         """
-        result = await self.client.post("invoicing", f"documents/{document_id}/attach", data)
+        result = await self.client.post(f"invoicing/documents/{document_id}/attach", data=data)
         return cast(Dict[str, Any], result)
 
     async def update_tracking(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -185,7 +195,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The tracking update response
         """
-        result = await self.client.post("invoicing", f"documents/{document_id}/tracking", data)
+        result = await self.client.post(f"invoicing/documents/{document_id}/tracking", data=data)
         return cast(Dict[str, Any], result)
 
     async def update_pipeline(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -199,7 +209,7 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             The pipeline update response
         """
-        result = await self.client.post("invoicing", f"documents/{document_id}/pipeline", data)
+        result = await self.client.post(f"invoicing/documents/{document_id}/pipeline", data=data)
         return cast(Dict[str, Any], result)
 
     async def list_payment_methods(self) -> List[Dict[str, Any]]:
@@ -209,5 +219,5 @@ class AsyncDocumentsResource(AsyncBaseResource):
         Returns:
             A list of payment methods
         """
-        result = await self.client.get("invoicing", "paymentmethods")
+        result = await self.client.get("invoicing/paymentmethods")
         return cast(List[Dict[str, Any]], result) 

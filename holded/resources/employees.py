@@ -16,110 +16,110 @@ class EmployeesResource(BaseResource):
         List all employees.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of employees
+            A list of employees.
         """
-        return cast(List[Dict[str, Any]], self.client.get("team", "employees", params=params))
+        return cast(List[Dict[str, Any]], self.client.get("team/employees", params=params))
 
     def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new employee.
 
         Args:
-            data: Employee data
+            data: Employee data.
 
         Returns:
-            The created employee
+            The created employee.
         """
-        return cast(Dict[str, Any], self.client.post("team", "employees", data))
+        return cast(Dict[str, Any], self.client.post("team/employees", data=data))
 
     def get(self, employee_id: str) -> Dict[str, Any]:
         """
         Get a specific employee.
 
         Args:
-            employee_id: The employee ID
+            employee_id: The employee ID.
 
         Returns:
-            The employee details
+            The employee.
         """
-        return cast(Dict[str, Any], self.client.get("team", "employees", employee_id))
+        return cast(Dict[str, Any], self.client.get(f"team/employees/{employee_id}"))
 
     def update(self, employee_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update an employee.
 
         Args:
-            employee_id: The employee ID
-            data: Updated employee data
+            employee_id: The employee ID.
+            data: Updated employee data.
 
         Returns:
-            The updated employee
+            The updated employee.
         """
-        return cast(Dict[str, Any], self.client.put("team", "employees", employee_id, data))
+        return cast(Dict[str, Any], self.client.put(f"team/employees/{employee_id}", data=data))
 
     def delete(self, employee_id: str) -> Dict[str, Any]:
         """
         Delete an employee.
 
         Args:
-            employee_id: The employee ID
+            employee_id: The employee ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        return cast(Dict[str, Any], self.client.delete("team", "employees", employee_id))
+        return cast(Dict[str, Any], self.client.delete(f"team/employees/{employee_id}"))
 
     def list_time_trackings(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
-        List all time trackings for all employees.
+        List all time trackings.
 
         Args:
-            params: Optional query parameters (e.g., page, limit, from, to)
+            params: Optional query parameters.
 
         Returns:
-            A list of time trackings
+            A list of time trackings.
         """
-        return cast(List[Dict[str, Any]], self.client.get("team", "timetracking", params=params))
+        return cast(List[Dict[str, Any]], self.client.get("team/timetracking", params=params))
 
     def get_time_tracking(self, tracking_id: str) -> Dict[str, Any]:
         """
         Get a specific time tracking.
 
         Args:
-            tracking_id: The time tracking ID
+            tracking_id: The time tracking ID.
 
         Returns:
-            The time tracking details
+            The time tracking.
         """
-        return cast(Dict[str, Any], self.client.get("team", "timetracking", tracking_id))
+        return cast(Dict[str, Any], self.client.get(f"team/timetracking/{tracking_id}"))
 
     def update_time_tracking(self, tracking_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update a time tracking.
 
         Args:
-            tracking_id: The time tracking ID
-            data: Updated time tracking data
+            tracking_id: The time tracking ID.
+            data: Updated time tracking data.
 
         Returns:
-            The updated time tracking
+            The updated time tracking.
         """
-        return cast(Dict[str, Any], self.client.put("team", "timetracking", tracking_id, data))
+        return cast(Dict[str, Any], self.client.put(f"team/timetracking/{tracking_id}", data=data))
 
     def delete_time_tracking(self, tracking_id: str) -> Dict[str, Any]:
         """
         Delete a time tracking.
 
         Args:
-            tracking_id: The time tracking ID
+            tracking_id: The time tracking ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        return cast(Dict[str, Any], self.client.delete("team", "timetracking", tracking_id))
+        return cast(Dict[str, Any], self.client.delete(f"team/timetracking/{tracking_id}"))
 
     def list_employee_time_trackings(self, employee_id: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """

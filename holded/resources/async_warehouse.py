@@ -11,17 +11,26 @@ class AsyncWarehouseResource(AsyncBaseResource):
     Resource for interacting with the Warehouse API asynchronously.
     """
 
+    def __init__(self, client):
+        """Initialize the warehouse resource.
+
+        Args:
+            client: The Holded async client instance.
+        """
+        self.client = client
+        self.base_path = "warehouse"
+
     async def list_warehouses(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all warehouses asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of warehouses
+            A list of warehouses.
         """
-        result = await self.client.get("warehouse", "warehouses", params=params)
+        result = await self.client.get(f"{self.base_path}/warehouses", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_warehouse(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -29,12 +38,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Create a new warehouse asynchronously.
 
         Args:
-            data: Warehouse data
+            data: Warehouse data.
 
         Returns:
-            The created warehouse
+            The created warehouse.
         """
-        result = await self.client.post("warehouse", "warehouses", data)
+        result = await self.client.post(f"{self.base_path}/warehouses", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_warehouse(self, warehouse_id: str) -> Dict[str, Any]:
@@ -42,12 +51,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Get a specific warehouse asynchronously.
 
         Args:
-            warehouse_id: The warehouse ID
+            warehouse_id: The warehouse ID.
 
         Returns:
-            The warehouse details
+            The warehouse.
         """
-        result = await self.client.get("warehouse", "warehouses", warehouse_id)
+        result = await self.client.get(f"{self.base_path}/warehouses/{warehouse_id}")
         return cast(Dict[str, Any], result)
 
     async def update_warehouse(self, warehouse_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -55,13 +64,13 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Update a warehouse asynchronously.
 
         Args:
-            warehouse_id: The warehouse ID
-            data: Updated warehouse data
+            warehouse_id: The warehouse ID.
+            data: Updated warehouse data.
 
         Returns:
-            The updated warehouse
+            The updated warehouse.
         """
-        result = await self.client.put("warehouse", "warehouses", warehouse_id, data)
+        result = await self.client.put(f"{self.base_path}/warehouses/{warehouse_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete_warehouse(self, warehouse_id: str) -> Dict[str, Any]:
@@ -69,12 +78,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Delete a warehouse asynchronously.
 
         Args:
-            warehouse_id: The warehouse ID
+            warehouse_id: The warehouse ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("warehouse", "warehouses", warehouse_id)
+        result = await self.client.delete(f"{self.base_path}/warehouses/{warehouse_id}")
         return cast(Dict[str, Any], result)
 
     async def list_stock_adjustments(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -82,12 +91,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         List all stock adjustments asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of stock adjustments
+            A list of stock adjustments.
         """
-        result = await self.client.get("warehouse", "stockAdjustments", params=params)
+        result = await self.client.get(f"{self.base_path}/stockAdjustments", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_stock_adjustment(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -95,12 +104,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Create a new stock adjustment asynchronously.
 
         Args:
-            data: Stock adjustment data
+            data: Stock adjustment data.
 
         Returns:
-            The created stock adjustment
+            The created stock adjustment.
         """
-        result = await self.client.post("warehouse", "stockAdjustments", data)
+        result = await self.client.post(f"{self.base_path}/stockAdjustments", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_stock_adjustment(self, adjustment_id: str) -> Dict[str, Any]:
@@ -108,12 +117,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Get a specific stock adjustment asynchronously.
 
         Args:
-            adjustment_id: The stock adjustment ID
+            adjustment_id: The stock adjustment ID.
 
         Returns:
-            The stock adjustment details
+            The stock adjustment.
         """
-        result = await self.client.get("warehouse", "stockAdjustments", adjustment_id)
+        result = await self.client.get(f"{self.base_path}/stockAdjustments/{adjustment_id}")
         return cast(Dict[str, Any], result)
 
     async def update_stock_adjustment(self, adjustment_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -121,13 +130,13 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Update a stock adjustment asynchronously.
 
         Args:
-            adjustment_id: The stock adjustment ID
-            data: Updated stock adjustment data
+            adjustment_id: The stock adjustment ID.
+            data: Updated stock adjustment data.
 
         Returns:
-            The updated stock adjustment
+            The updated stock adjustment.
         """
-        result = await self.client.put("warehouse", "stockAdjustments", adjustment_id, data)
+        result = await self.client.put(f"{self.base_path}/stockAdjustments/{adjustment_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete_stock_adjustment(self, adjustment_id: str) -> Dict[str, Any]:
@@ -135,12 +144,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Delete a stock adjustment asynchronously.
 
         Args:
-            adjustment_id: The stock adjustment ID
+            adjustment_id: The stock adjustment ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("warehouse", "stockAdjustments", adjustment_id)
+        result = await self.client.delete(f"{self.base_path}/stockAdjustments/{adjustment_id}")
         return cast(Dict[str, Any], result)
 
     async def list_stock_transfers(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -148,12 +157,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         List all stock transfers asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of stock transfers
+            A list of stock transfers.
         """
-        result = await self.client.get("warehouse", "stockTransfers", params=params)
+        result = await self.client.get("warehouse/stockTransfers", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_stock_transfer(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -161,12 +170,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Create a new stock transfer asynchronously.
 
         Args:
-            data: Stock transfer data
+            data: Stock transfer data.
 
         Returns:
-            The created stock transfer
+            The created stock transfer.
         """
-        result = await self.client.post("warehouse", "stockTransfers", data)
+        result = await self.client.post("warehouse/stockTransfers", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_stock_transfer(self, transfer_id: str) -> Dict[str, Any]:
@@ -174,12 +183,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Get a specific stock transfer asynchronously.
 
         Args:
-            transfer_id: The stock transfer ID
+            transfer_id: The stock transfer ID.
 
         Returns:
-            The stock transfer details
+            The stock transfer.
         """
-        result = await self.client.get("warehouse", "stockTransfers", transfer_id)
+        result = await self.client.get(f"warehouse/stockTransfers/{transfer_id}")
         return cast(Dict[str, Any], result)
 
     async def update_stock_transfer(self, transfer_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -187,13 +196,13 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Update a stock transfer asynchronously.
 
         Args:
-            transfer_id: The stock transfer ID
-            data: Updated stock transfer data
+            transfer_id: The stock transfer ID.
+            data: Updated stock transfer data.
 
         Returns:
-            The updated stock transfer
+            The updated stock transfer.
         """
-        result = await self.client.put("warehouse", "stockTransfers", transfer_id, data)
+        result = await self.client.put(f"warehouse/stockTransfers/{transfer_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete_stock_transfer(self, transfer_id: str) -> Dict[str, Any]:
@@ -201,12 +210,12 @@ class AsyncWarehouseResource(AsyncBaseResource):
         Delete a stock transfer asynchronously.
 
         Args:
-            transfer_id: The stock transfer ID
+            transfer_id: The stock transfer ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("warehouse", "stockTransfers", transfer_id)
+        result = await self.client.delete(f"warehouse/stockTransfers/{transfer_id}")
         return cast(Dict[str, Any], result)
 
     async def get_product_stock(self, product_id: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

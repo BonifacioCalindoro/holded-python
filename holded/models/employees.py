@@ -298,7 +298,3 @@ class ExpenseListResponse(BaseResponse):
     total: Optional[int] = Field(default=None, description="Total number of expenses")
     page: Optional[int] = Field(default=None, description="Current page")
     limit: Optional[int] = Field(default=None, description="Items per page")
-
-
-# Fix forward references
-PayrollCreate.model_rebuild() 

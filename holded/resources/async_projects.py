@@ -11,17 +11,26 @@ class AsyncProjectsResource(AsyncBaseResource):
     Resource for interacting with the Projects API asynchronously.
     """
 
+    def __init__(self, client):
+        """Initialize the projects resource.
+
+        Args:
+            client: The Holded async client instance.
+        """
+        self.client = client
+        self.base_path = "projects"
+
     async def list(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all projects asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of projects
+            A list of projects.
         """
-        result = await self.client.get("projects", "projects", params=params)
+        result = await self.client.get(f"{self.base_path}/projects", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -29,12 +38,12 @@ class AsyncProjectsResource(AsyncBaseResource):
         Create a new project asynchronously.
 
         Args:
-            data: Project data
+            data: Project data.
 
         Returns:
-            The created project
+            The created project.
         """
-        result = await self.client.post("projects", "projects", data)
+        result = await self.client.post(f"{self.base_path}/projects", data=data)
         return cast(Dict[str, Any], result)
 
     async def get(self, project_id: str) -> Dict[str, Any]:
@@ -42,12 +51,12 @@ class AsyncProjectsResource(AsyncBaseResource):
         Get a specific project asynchronously.
 
         Args:
-            project_id: The project ID
+            project_id: The project ID.
 
         Returns:
-            The project details
+            The project.
         """
-        result = await self.client.get("projects", "projects", project_id)
+        result = await self.client.get(f"{self.base_path}/projects/{project_id}")
         return cast(Dict[str, Any], result)
 
     async def update(self, project_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -55,13 +64,13 @@ class AsyncProjectsResource(AsyncBaseResource):
         Update a project asynchronously.
 
         Args:
-            project_id: The project ID
-            data: Updated project data
+            project_id: The project ID.
+            data: Updated project data.
 
         Returns:
-            The updated project
+            The updated project.
         """
-        result = await self.client.put("projects", "projects", project_id, data)
+        result = await self.client.put(f"{self.base_path}/projects/{project_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete(self, project_id: str) -> Dict[str, Any]:
@@ -69,12 +78,12 @@ class AsyncProjectsResource(AsyncBaseResource):
         Delete a project asynchronously.
 
         Args:
-            project_id: The project ID
+            project_id: The project ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("projects", "projects", project_id)
+        result = await self.client.delete(f"{self.base_path}/projects/{project_id}")
         return cast(Dict[str, Any], result)
 
     async def get_summary(self, project_id: str) -> Dict[str, Any]:
@@ -82,12 +91,12 @@ class AsyncProjectsResource(AsyncBaseResource):
         Get a project summary asynchronously.
 
         Args:
-            project_id: The project ID
+            project_id: The project ID.
 
         Returns:
-            The project summary
+            The project summary.
         """
-        result = await self.client.get("projects", f"projects/{project_id}/summary")
+        result = await self.client.get(f"{self.base_path}/projects/{project_id}/summary")
         return cast(Dict[str, Any], result)
 
     async def list_tasks(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -95,12 +104,12 @@ class AsyncProjectsResource(AsyncBaseResource):
         List all tasks asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of tasks
+            A list of tasks.
         """
-        result = await self.client.get("projects", "tasks", params=params)
+        result = await self.client.get(f"{self.base_path}/tasks", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_task(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -108,12 +117,12 @@ class AsyncProjectsResource(AsyncBaseResource):
         Create a new task asynchronously.
 
         Args:
-            data: Task data
+            data: Task data.
 
         Returns:
-            The created task
+            The created task.
         """
-        result = await self.client.post("projects", "tasks", data)
+        result = await self.client.post(f"{self.base_path}/tasks", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_task(self, task_id: str) -> Dict[str, Any]:
@@ -121,12 +130,12 @@ class AsyncProjectsResource(AsyncBaseResource):
         Get a specific task asynchronously.
 
         Args:
-            task_id: The task ID
+            task_id: The task ID.
 
         Returns:
-            The task details
+            The task.
         """
-        result = await self.client.get("projects", "tasks", task_id)
+        result = await self.client.get(f"{self.base_path}/tasks/{task_id}")
         return cast(Dict[str, Any], result)
 
     async def delete_task(self, task_id: str) -> Dict[str, Any]:
@@ -134,12 +143,12 @@ class AsyncProjectsResource(AsyncBaseResource):
         Delete a task asynchronously.
 
         Args:
-            task_id: The task ID
+            task_id: The task ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("projects", "tasks", task_id)
+        result = await self.client.delete(f"{self.base_path}/tasks/{task_id}")
         return cast(Dict[str, Any], result)
 
     async def list_project_time_trackings(self, project_id: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -147,27 +156,27 @@ class AsyncProjectsResource(AsyncBaseResource):
         List all time trackings for a specific project asynchronously.
 
         Args:
-            project_id: The project ID
-            params: Optional query parameters (e.g., page, limit)
+            project_id: The project ID.
+            params: Optional query parameters.
 
         Returns:
-            A list of time trackings for the project
+            A list of time trackings.
         """
-        result = await self.client.get("projects", f"projects/{project_id}/times", params=params)
+        result = await self.client.get(f"{self.base_path}/projects/{project_id}/times", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_project_time_tracking(self, project_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Create a time tracking for a specific project asynchronously.
+        Create a new time tracking for a specific project asynchronously.
 
         Args:
-            project_id: The project ID
-            data: Time tracking data
+            project_id: The project ID.
+            data: Time tracking data.
 
         Returns:
-            The created time tracking
+            The created time tracking.
         """
-        result = await self.client.post("projects", f"projects/{project_id}/times", data)
+        result = await self.client.post(f"{self.base_path}/projects/{project_id}/times", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_project_time_tracking(self, project_id: str, tracking_id: str) -> Dict[str, Any]:
@@ -175,13 +184,13 @@ class AsyncProjectsResource(AsyncBaseResource):
         Get a specific time tracking for a project asynchronously.
 
         Args:
-            project_id: The project ID
-            tracking_id: The time tracking ID
+            project_id: The project ID.
+            tracking_id: The time tracking ID.
 
         Returns:
-            The time tracking details
+            The time tracking.
         """
-        result = await self.client.get("projects", f"projects/{project_id}/times/{tracking_id}")
+        result = await self.client.get(f"{self.base_path}/projects/{project_id}/times/{tracking_id}")
         return cast(Dict[str, Any], result)
 
     async def update_project_time_tracking(self, project_id: str, tracking_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -189,14 +198,14 @@ class AsyncProjectsResource(AsyncBaseResource):
         Update a time tracking for a project asynchronously.
 
         Args:
-            project_id: The project ID
-            tracking_id: The time tracking ID
-            data: Updated time tracking data
+            project_id: The project ID.
+            tracking_id: The time tracking ID.
+            data: Updated time tracking data.
 
         Returns:
-            The updated time tracking
+            The updated time tracking.
         """
-        result = await self.client.put("projects", f"projects/{project_id}/times/{tracking_id}", data)
+        result = await self.client.put(f"{self.base_path}/projects/{project_id}/times/{tracking_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete_project_time_tracking(self, project_id: str, tracking_id: str) -> Dict[str, Any]:
@@ -204,24 +213,24 @@ class AsyncProjectsResource(AsyncBaseResource):
         Delete a time tracking for a project asynchronously.
 
         Args:
-            project_id: The project ID
-            tracking_id: The time tracking ID
+            project_id: The project ID.
+            tracking_id: The time tracking ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("projects", f"projects/{project_id}/times/{tracking_id}")
+        result = await self.client.delete(f"{self.base_path}/projects/{project_id}/times/{tracking_id}")
         return cast(Dict[str, Any], result)
 
     async def list_all_time_trackings(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
-        List all time trackings across all projects asynchronously.
+        List all time trackings asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of all time trackings
+            A list of time trackings.
         """
-        result = await self.client.get("projects", "times", params=params)
+        result = await self.client.get(f"{self.base_path}/times", params=params)
         return cast(List[Dict[str, Any]], result) 

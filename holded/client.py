@@ -63,10 +63,11 @@ class HoldedClient:
             retry_delay: Delay between retries in seconds.
         """
         self.api_key = api_key
-        self.base_url = urljoin(base_url, api_version + "/")
+        self.base_url = base_url
         self.timeout = timeout
         self.max_retries = max_retries
         self.retry_delay = retry_delay
+        self.api_version = api_version
         self.session = requests.Session()
         self.session.headers.update(
             {
@@ -92,15 +93,20 @@ class HoldedClient:
         self.remittances = RemittancesResource(self)
 
     def _build_url(self, path: str) -> str:
-        """Build the full URL for a request.
+        """Build the URL for the API request.
 
         Args:
-            path: The API endpoint path.
+            path: The API path (e.g., 'invoicing/documents')
 
         Returns:
             The full URL.
         """
-        return urljoin(self.base_url, path.lstrip("/"))
+        values = path.split("/")
+        service = values[0]
+        endpoint = values[1]
+        extra = values[2:]
+        print(self.base_url  + service + "/" + self.api_version + "/" + endpoint + "/" + "/".join(extra))
+        return urljoin(self.base_url, service + "/" + self.api_version + "/" + endpoint + "/" + "/".join(extra))
 
     def _serialize_data(self, data: Union[Dict[str, Any], BaseModel]) -> Dict[str, Any]:
         """Serialize data for a request.

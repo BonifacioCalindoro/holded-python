@@ -11,17 +11,26 @@ class AsyncProductsResource(AsyncBaseResource):
     Resource for interacting with the Products API asynchronously.
     """
 
+    def __init__(self, client):
+        """Initialize the products resource.
+
+        Args:
+            client: The Holded async client instance.
+        """
+        self.client = client
+        self.base_path = "invoicing/products"
+
     async def list(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all products asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of products
+            A list of products.
         """
-        result = await self.client.get("invoicing", "products", params=params)
+        result = await self.client.get(self.base_path, params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -29,12 +38,12 @@ class AsyncProductsResource(AsyncBaseResource):
         Create a new product asynchronously.
 
         Args:
-            data: Product data
+            data: Product data.
 
         Returns:
-            The created product
+            The created product.
         """
-        result = await self.client.post("invoicing", "products", data)
+        result = await self.client.post(self.base_path, data=data)
         return cast(Dict[str, Any], result)
 
     async def get(self, product_id: str) -> Dict[str, Any]:
@@ -42,12 +51,12 @@ class AsyncProductsResource(AsyncBaseResource):
         Get a specific product asynchronously.
 
         Args:
-            product_id: The product ID
+            product_id: The product ID.
 
         Returns:
-            The product details
+            The product.
         """
-        result = await self.client.get("invoicing", "products", product_id)
+        result = await self.client.get(f"{self.base_path}/{product_id}")
         return cast(Dict[str, Any], result)
 
     async def update(self, product_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -55,13 +64,13 @@ class AsyncProductsResource(AsyncBaseResource):
         Update a product asynchronously.
 
         Args:
-            product_id: The product ID
-            data: Updated product data
+            product_id: The product ID.
+            data: Updated product data.
 
         Returns:
-            The updated product
+            The updated product.
         """
-        result = await self.client.put("invoicing", "products", product_id, data)
+        result = await self.client.put(f"{self.base_path}/{product_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete(self, product_id: str) -> Dict[str, Any]:
@@ -69,12 +78,12 @@ class AsyncProductsResource(AsyncBaseResource):
         Delete a product asynchronously.
 
         Args:
-            product_id: The product ID
+            product_id: The product ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("invoicing", "products", product_id)
+        result = await self.client.delete(f"{self.base_path}/{product_id}")
         return cast(Dict[str, Any], result)
 
     async def list_categories(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -82,12 +91,12 @@ class AsyncProductsResource(AsyncBaseResource):
         List all product categories asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of product categories
+            A list of product categories.
         """
-        result = await self.client.get("invoicing", "products/categories", params=params)
+        result = await self.client.get(f"{self.base_path}/categories", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_category(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -95,12 +104,12 @@ class AsyncProductsResource(AsyncBaseResource):
         Create a new product category asynchronously.
 
         Args:
-            data: Category data
+            data: Category data.
 
         Returns:
-            The created category
+            The created category.
         """
-        result = await self.client.post("invoicing", "products/categories", data)
+        result = await self.client.post(f"{self.base_path}/categories", data=data)
         return cast(Dict[str, Any], result)
 
     async def update_category(self, category_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -108,13 +117,13 @@ class AsyncProductsResource(AsyncBaseResource):
         Update a product category asynchronously.
 
         Args:
-            category_id: The category ID
-            data: Updated category data
+            category_id: The category ID.
+            data: Updated category data.
 
         Returns:
-            The updated category
+            The updated category.
         """
-        result = await self.client.put("invoicing", "products/categories", category_id, data)
+        result = await self.client.put(f"{self.base_path}/categories/{category_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete_category(self, category_id: str) -> Dict[str, Any]:
@@ -122,12 +131,12 @@ class AsyncProductsResource(AsyncBaseResource):
         Delete a product category asynchronously.
 
         Args:
-            category_id: The category ID
+            category_id: The category ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("invoicing", "products/categories", category_id)
+        result = await self.client.delete(f"{self.base_path}/categories/{category_id}")
         return cast(Dict[str, Any], result)
 
     async def list_variants(self, product_id: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:

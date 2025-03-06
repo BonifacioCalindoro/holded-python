@@ -16,119 +16,119 @@ class ProductsResource(BaseResource):
         List all products.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of products
+            A list of products.
         """
-        result = self.client.get("invoicing", "products", params=params)
-        return cast(List[Dict[str, Any]], result)
+        result = self.client.get("invoicing/products", params=params)
+        return result
 
     def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new product.
 
         Args:
-            data: Product data
+            data: Product data.
 
         Returns:
-            The created product
+            The created product.
         """
-        result = self.client.post("invoicing", "products", data)
-        return cast(Dict[str, Any], result)
+        result = self.client.post("invoicing/products", data=data)
+        return result
 
     def get(self, product_id: str) -> Dict[str, Any]:
         """
         Get a specific product.
 
         Args:
-            product_id: The product ID
+            product_id: The product ID.
 
         Returns:
-            The product details
+            The product.
         """
-        result = self.client.get("invoicing", "products", product_id)
-        return cast(Dict[str, Any], result)
+        result = self.client.get(f"invoicing/products/{product_id}")
+        return result
 
     def update(self, product_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update a product.
 
         Args:
-            product_id: The product ID
-            data: Updated product data
+            product_id: The product ID.
+            data: Updated product data.
 
         Returns:
-            The updated product
+            The updated product.
         """
-        result = self.client.put("invoicing", "products", product_id, data)
-        return cast(Dict[str, Any], result)
+        result = self.client.put(f"invoicing/products/{product_id}", data=data)
+        return result
 
     def delete(self, product_id: str) -> Dict[str, Any]:
         """
         Delete a product.
 
         Args:
-            product_id: The product ID
+            product_id: The product ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = self.client.delete("invoicing", "products", product_id)
-        return cast(Dict[str, Any], result)
+        result = self.client.delete(f"invoicing/products/{product_id}")
+        return result
 
     def list_categories(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all product categories.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of product categories
+            A list of product categories.
         """
-        result = self.client.get("invoicing", "products/categories", params=params)
-        return cast(List[Dict[str, Any]], result)
+        result = self.client.get("invoicing/products/categories", params=params)
+        return result
 
     def create_category(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new product category.
 
         Args:
-            data: Category data
+            data: Category data.
 
         Returns:
-            The created category
+            The created category.
         """
-        result = self.client.post("invoicing", "products/categories", data)
-        return cast(Dict[str, Any], result)
+        result = self.client.post("invoicing/products/categories", data=data)
+        return result
 
     def update_category(self, category_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update a product category.
 
         Args:
-            category_id: The category ID
-            data: Updated category data
+            category_id: The category ID.
+            data: Updated category data.
 
         Returns:
-            The updated category
+            The updated category.
         """
-        result = self.client.put("invoicing", "products/categories", category_id, data)
-        return cast(Dict[str, Any], result)
+        result = self.client.put(f"invoicing/products/categories/{category_id}", data=data)
+        return result
 
     def delete_category(self, category_id: str) -> Dict[str, Any]:
         """
         Delete a product category.
 
         Args:
-            category_id: The category ID
+            category_id: The category ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = self.client.delete("invoicing", "products/categories", category_id)
-        return cast(Dict[str, Any], result)
+        result = self.client.delete(f"invoicing/products/categories/{category_id}")
+        return result
 
     def list_variants(self, product_id: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """

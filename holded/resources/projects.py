@@ -16,61 +16,61 @@ class ProjectsResource(BaseResource):
         List all projects.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of projects
+            A list of projects.
         """
-        return cast(List[Dict[str, Any]], self.client.get("projects", "projects", params=params))
+        return cast(List[Dict[str, Any]], self.client.get("projects/projects", params=params))
 
     def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new project.
 
         Args:
-            data: Project data
+            data: Project data.
 
         Returns:
-            The created project
+            The created project.
         """
-        return cast(Dict[str, Any], self.client.post("projects", "projects", data))
+        return cast(Dict[str, Any], self.client.post("projects/projects", data=data))
 
     def get(self, project_id: str) -> Dict[str, Any]:
         """
         Get a specific project.
 
         Args:
-            project_id: The project ID
+            project_id: The project ID.
 
         Returns:
-            The project details
+            The project.
         """
-        return cast(Dict[str, Any], self.client.get("projects", "projects", project_id))
+        return cast(Dict[str, Any], self.client.get(f"projects/projects/{project_id}"))
 
     def update(self, project_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update a project.
 
         Args:
-            project_id: The project ID
-            data: Updated project data
+            project_id: The project ID.
+            data: Updated project data.
 
         Returns:
-            The updated project
+            The updated project.
         """
-        return cast(Dict[str, Any], self.client.put("projects", "projects", project_id, data))
+        return cast(Dict[str, Any], self.client.put(f"projects/projects/{project_id}", data=data))
 
     def delete(self, project_id: str) -> Dict[str, Any]:
         """
         Delete a project.
 
         Args:
-            project_id: The project ID
+            project_id: The project ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        return cast(Dict[str, Any], self.client.delete("projects", "projects", project_id))
+        return cast(Dict[str, Any], self.client.delete(f"projects/projects/{project_id}"))
 
     def get_summary(self, project_id: str) -> Dict[str, Any]:
         """
@@ -92,48 +92,48 @@ class ProjectsResource(BaseResource):
         List all tasks.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of tasks
+            A list of tasks.
         """
-        return cast(List[Dict[str, Any]], self.client.get("projects", "tasks", params=params))
+        return cast(List[Dict[str, Any]], self.client.get("projects/tasks", params=params))
 
     def create_task(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new task.
 
         Args:
-            data: Task data
+            data: Task data.
 
         Returns:
-            The created task
+            The created task.
         """
-        return cast(Dict[str, Any], self.client.post("projects", "tasks", data))
+        return cast(Dict[str, Any], self.client.post("projects/tasks", data=data))
 
     def get_task(self, task_id: str) -> Dict[str, Any]:
         """
         Get a specific task.
 
         Args:
-            task_id: The task ID
+            task_id: The task ID.
 
         Returns:
-            The task details
+            The task.
         """
-        return cast(Dict[str, Any], self.client.get("projects", "tasks", task_id))
+        return cast(Dict[str, Any], self.client.get(f"projects/tasks/{task_id}"))
 
     def delete_task(self, task_id: str) -> Dict[str, Any]:
         """
         Delete a task.
 
         Args:
-            task_id: The task ID
+            task_id: The task ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        return cast(Dict[str, Any], self.client.delete("projects", "tasks", task_id))
+        return cast(Dict[str, Any], self.client.delete(f"projects/tasks/{task_id}"))
 
     def list_project_time_trackings(self, project_id: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
@@ -229,4 +229,16 @@ class ProjectsResource(BaseResource):
         return cast(
             List[Dict[str, Any]],
             self.client.get("projects", "times", params=params)
-        ) 
+        )
+
+    def list_times(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """
+        List all time entries.
+
+        Args:
+            params: Optional query parameters.
+
+        Returns:
+            A list of time entries.
+        """
+        return cast(List[Dict[str, Any]], self.client.get("projects/times", params=params)) 

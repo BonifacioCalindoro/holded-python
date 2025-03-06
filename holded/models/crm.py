@@ -2,11 +2,38 @@
 Models for the CRM API.
 """
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
+from enum import Enum
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from .base import BaseModel, BaseResponse, PaginationParams, DateRangeParams
+
+
+class LeadStage(str, Enum):
+    """Lead stage enum."""
+    NEW = "new"
+    QUALIFIED = "qualified"
+    PROPOSAL = "proposal"
+    NEGOTIATION = "negotiation"
+    WON = "won"
+    LOST = "lost"
+
+
+class TaskPriority(str, Enum):
+    """Task priority enum."""
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    URGENT = "urgent"
+
+
+class TaskStatus(str, Enum):
+    """Task status enum."""
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
 
 
 class FunnelCreate(BaseModel):
@@ -15,6 +42,8 @@ class FunnelCreate(BaseModel):
     name: str = Field(..., description="Funnel name")
     description: Optional[str] = Field(default=None, description="Funnel description")
     stages: List[str] = Field(..., description="Funnel stages")
+    color: Optional[str] = Field(default=None, description="Funnel color (hex code)")
+    is_default: Optional[bool] = Field(default=False, description="Whether this is the default funnel")
 
 
 class FunnelUpdate(BaseModel):
@@ -23,14 +52,30 @@ class FunnelUpdate(BaseModel):
     name: Optional[str] = Field(default=None, description="Funnel name")
     description: Optional[str] = Field(default=None, description="Funnel description")
     stages: Optional[List[str]] = Field(default=None, description="Funnel stages")
+    color: Optional[str] = Field(default=None, description="Funnel color (hex code)")
+    is_default: Optional[bool] = Field(default=None, description="Whether this is the default funnel")
 
 
-class Funnel(FunnelCreate):
+class Funnel(BaseModel):
     """Funnel model."""
     
     id: str = Field(..., description="Funnel ID")
+    name: str = Field(..., description="Funnel name")
+    description: Optional[str] = Field(default=None, description="Funnel description")
+    stages: List[str] = Field(..., description="Funnel stages")
+    color: Optional[str] = Field(default=None, description="Funnel color (hex code)")
+    is_default: Optional[bool] = Field(default=False, description="Whether this is the default funnel")
     created_at: Optional[datetime] = Field(default=None, description="Creation date")
     updated_at: Optional[datetime] = Field(default=None, description="Last update date")
+    lead_count: Optional[int] = Field(default=None, description="Number of leads in this funnel")
+    stage_counts: Optional[Dict[str, int]] = Field(default=None, description="Number of leads in each stage")
+
+
+class FunnelListParams(PaginationParams):
+    """Parameters for listing funnels."""
+    
+    query: Optional[str] = Field(default=None, description="Search query")
+    is_default: Optional[bool] = Field(default=None, description="Filter by default status")
 
 
 class LeadCreate(BaseModel):
@@ -45,6 +90,13 @@ class LeadCreate(BaseModel):
     assignee_id: Optional[str] = Field(default=None, description="Assignee ID")
     expected_close_date: Optional[datetime] = Field(default=None, description="Expected close date")
     custom_fields: Optional[Dict[str, Any]] = Field(default=None, description="Custom fields")
+    tags: Optional[List[str]] = Field(default=None, description="Lead tags")
+    source: Optional[str] = Field(default=None, description="Lead source")
+    probability: Optional[int] = Field(default=None, description="Win probability percentage (0-100)")
+    currency: Optional[str] = Field(default="EUR", description="Lead value currency")
+    company_name: Optional[str] = Field(default=None, description="Company name if no contact is linked")
+    email: Optional[str] = Field(default=None, description="Email if no contact is linked")
+    phone: Optional[str] = Field(default=None, description="Phone if no contact is linked")
 
 
 class LeadUpdate(BaseModel):
@@ -59,14 +111,44 @@ class LeadUpdate(BaseModel):
     assignee_id: Optional[str] = Field(default=None, description="Assignee ID")
     expected_close_date: Optional[datetime] = Field(default=None, description="Expected close date")
     custom_fields: Optional[Dict[str, Any]] = Field(default=None, description="Custom fields")
+    tags: Optional[List[str]] = Field(default=None, description="Lead tags")
+    source: Optional[str] = Field(default=None, description="Lead source")
+    probability: Optional[int] = Field(default=None, description="Win probability percentage (0-100)")
+    currency: Optional[str] = Field(default=None, description="Lead value currency")
+    company_name: Optional[str] = Field(default=None, description="Company name if no contact is linked")
+    email: Optional[str] = Field(default=None, description="Email if no contact is linked")
+    phone: Optional[str] = Field(default=None, description="Phone if no contact is linked")
 
 
-class Lead(LeadCreate):
+class Lead(BaseModel):
     """Lead model."""
     
     id: str = Field(..., description="Lead ID")
+    name: str = Field(..., description="Lead name")
+    contact_id: Optional[str] = Field(default=None, description="Contact ID")
+    contact_name: Optional[str] = Field(default=None, description="Contact name")
+    funnel_id: str = Field(..., description="Funnel ID")
+    funnel_name: Optional[str] = Field(default=None, description="Funnel name")
+    stage: str = Field(..., description="Lead stage")
+    value: Optional[float] = Field(default=None, description="Lead value")
+    description: Optional[str] = Field(default=None, description="Lead description")
+    assignee_id: Optional[str] = Field(default=None, description="Assignee ID")
+    assignee_name: Optional[str] = Field(default=None, description="Assignee name")
+    expected_close_date: Optional[datetime] = Field(default=None, description="Expected close date")
+    custom_fields: Optional[Dict[str, Any]] = Field(default=None, description="Custom fields")
+    tags: Optional[List[str]] = Field(default=None, description="Lead tags")
+    source: Optional[str] = Field(default=None, description="Lead source")
+    probability: Optional[int] = Field(default=None, description="Win probability percentage (0-100)")
+    currency: Optional[str] = Field(default="EUR", description="Lead value currency")
+    company_name: Optional[str] = Field(default=None, description="Company name if no contact is linked")
+    email: Optional[str] = Field(default=None, description="Email if no contact is linked")
+    phone: Optional[str] = Field(default=None, description="Phone if no contact is linked")
     created_at: Optional[datetime] = Field(default=None, description="Creation date")
     updated_at: Optional[datetime] = Field(default=None, description="Last update date")
+    last_activity_at: Optional[datetime] = Field(default=None, description="Last activity date")
+    task_count: Optional[int] = Field(default=None, description="Number of tasks")
+    note_count: Optional[int] = Field(default=None, description="Number of notes")
+    document_count: Optional[int] = Field(default=None, description="Number of documents")
 
 
 class LeadListParams(PaginationParams, DateRangeParams):
@@ -77,6 +159,14 @@ class LeadListParams(PaginationParams, DateRangeParams):
     contact_id: Optional[str] = Field(default=None, description="Filter by contact ID")
     assignee_id: Optional[str] = Field(default=None, description="Filter by assignee ID")
     query: Optional[str] = Field(default=None, description="Search query")
+    tags: Optional[List[str]] = Field(default=None, description="Filter by tags")
+    source: Optional[str] = Field(default=None, description="Filter by source")
+    min_value: Optional[float] = Field(default=None, description="Filter by minimum value")
+    max_value: Optional[float] = Field(default=None, description="Filter by maximum value")
+    min_probability: Optional[int] = Field(default=None, description="Filter by minimum probability")
+    max_probability: Optional[int] = Field(default=None, description="Filter by maximum probability")
+    expected_close_date_start: Optional[datetime] = Field(default=None, description="Filter by expected close date start")
+    expected_close_date_end: Optional[datetime] = Field(default=None, description="Filter by expected close date end")
 
 
 class LeadNoteCreate(BaseModel):
@@ -84,15 +174,34 @@ class LeadNoteCreate(BaseModel):
     
     content: str = Field(..., description="Note content")
     user_id: Optional[str] = Field(default=None, description="User ID")
+    pinned: Optional[bool] = Field(default=False, description="Whether the note is pinned")
 
 
-class LeadNote(LeadNoteCreate):
+class LeadNoteUpdate(BaseModel):
+    """Model for updating a lead note."""
+    
+    content: Optional[str] = Field(default=None, description="Note content")
+    pinned: Optional[bool] = Field(default=None, description="Whether the note is pinned")
+
+
+class LeadNote(BaseModel):
     """Lead note model."""
     
     id: str = Field(..., description="Note ID")
     lead_id: str = Field(..., description="Lead ID")
+    content: str = Field(..., description="Note content")
+    user_id: Optional[str] = Field(default=None, description="User ID")
+    user_name: Optional[str] = Field(default=None, description="User name")
+    pinned: Optional[bool] = Field(default=False, description="Whether the note is pinned")
     created_at: Optional[datetime] = Field(default=None, description="Creation date")
     updated_at: Optional[datetime] = Field(default=None, description="Last update date")
+
+
+class LeadNoteListParams(PaginationParams):
+    """Parameters for listing lead notes."""
+    
+    pinned: Optional[bool] = Field(default=None, description="Filter by pinned status")
+    user_id: Optional[str] = Field(default=None, description="Filter by user ID")
 
 
 class LeadTaskCreate(BaseModel):
@@ -100,155 +209,100 @@ class LeadTaskCreate(BaseModel):
     
     title: str = Field(..., description="Task title")
     description: Optional[str] = Field(default=None, description="Task description")
-    due_date: Optional[datetime] = Field(default=None, description="Task due date")
+    due_date: Optional[datetime] = Field(default=None, description="Due date")
     assignee_id: Optional[str] = Field(default=None, description="Assignee ID")
-    status: Optional[str] = Field(default=None, description="Task status")
-    priority: Optional[str] = Field(default=None, description="Task priority")
+    priority: Optional[TaskPriority] = Field(default=TaskPriority.MEDIUM, description="Task priority")
+    status: Optional[TaskStatus] = Field(default=TaskStatus.PENDING, description="Task status")
+    reminder_date: Optional[datetime] = Field(default=None, description="Reminder date")
 
 
-class LeadTask(LeadTaskCreate):
+class LeadTaskUpdate(BaseModel):
+    """Model for updating a lead task."""
+    
+    title: Optional[str] = Field(default=None, description="Task title")
+    description: Optional[str] = Field(default=None, description="Task description")
+    due_date: Optional[datetime] = Field(default=None, description="Due date")
+    assignee_id: Optional[str] = Field(default=None, description="Assignee ID")
+    priority: Optional[TaskPriority] = Field(default=None, description="Task priority")
+    status: Optional[TaskStatus] = Field(default=None, description="Task status")
+    reminder_date: Optional[datetime] = Field(default=None, description="Reminder date")
+
+
+class LeadTask(BaseModel):
     """Lead task model."""
     
     id: str = Field(..., description="Task ID")
     lead_id: str = Field(..., description="Lead ID")
+    title: str = Field(..., description="Task title")
+    description: Optional[str] = Field(default=None, description="Task description")
+    due_date: Optional[datetime] = Field(default=None, description="Due date")
+    assignee_id: Optional[str] = Field(default=None, description="Assignee ID")
+    assignee_name: Optional[str] = Field(default=None, description="Assignee name")
+    priority: TaskPriority = Field(..., description="Task priority")
+    status: TaskStatus = Field(..., description="Task status")
+    reminder_date: Optional[datetime] = Field(default=None, description="Reminder date")
     created_at: Optional[datetime] = Field(default=None, description="Creation date")
     updated_at: Optional[datetime] = Field(default=None, description="Last update date")
+    completed_at: Optional[datetime] = Field(default=None, description="Completion date")
+    created_by_id: Optional[str] = Field(default=None, description="Creator ID")
+    created_by_name: Optional[str] = Field(default=None, description="Creator name")
 
 
-class EventCreate(BaseModel):
-    """Model for creating an event."""
+class LeadTaskListParams(PaginationParams, DateRangeParams):
+    """Parameters for listing lead tasks."""
     
-    title: str = Field(..., description="Event title")
-    description: Optional[str] = Field(default=None, description="Event description")
-    start_date: datetime = Field(..., description="Event start date")
-    end_date: datetime = Field(..., description="Event end date")
-    location: Optional[str] = Field(default=None, description="Event location")
-    attendees: Optional[List[str]] = Field(default=None, description="Event attendees (user IDs)")
-    lead_id: Optional[str] = Field(default=None, description="Related lead ID")
-    contact_id: Optional[str] = Field(default=None, description="Related contact ID")
-    custom_fields: Optional[Dict[str, Any]] = Field(default=None, description="Custom fields")
+    status: Optional[TaskStatus] = Field(default=None, description="Filter by status")
+    priority: Optional[TaskPriority] = Field(default=None, description="Filter by priority")
+    assignee_id: Optional[str] = Field(default=None, description="Filter by assignee ID")
+    due_date_start: Optional[datetime] = Field(default=None, description="Filter by due date start")
+    due_date_end: Optional[datetime] = Field(default=None, description="Filter by due date end")
 
 
-class EventUpdate(BaseModel):
-    """Model for updating an event."""
+class LeadDocumentLink(BaseModel):
+    """Model for linking a document to a lead."""
     
-    title: Optional[str] = Field(default=None, description="Event title")
-    description: Optional[str] = Field(default=None, description="Event description")
-    start_date: Optional[datetime] = Field(default=None, description="Event start date")
-    end_date: Optional[datetime] = Field(default=None, description="Event end date")
-    location: Optional[str] = Field(default=None, description="Event location")
-    attendees: Optional[List[str]] = Field(default=None, description="Event attendees (user IDs)")
-    lead_id: Optional[str] = Field(default=None, description="Related lead ID")
-    contact_id: Optional[str] = Field(default=None, description="Related contact ID")
-    custom_fields: Optional[Dict[str, Any]] = Field(default=None, description="Custom fields")
+    document_id: str = Field(..., description="Document ID")
+    document_type: Optional[str] = Field(default=None, description="Document type")
 
 
-class Event(EventCreate):
-    """Event model."""
+class LeadDocument(BaseModel):
+    """Lead document model."""
     
-    id: str = Field(..., description="Event ID")
+    id: str = Field(..., description="Link ID")
+    lead_id: str = Field(..., description="Lead ID")
+    document_id: str = Field(..., description="Document ID")
+    document_type: str = Field(..., description="Document type")
+    document_number: Optional[str] = Field(default=None, description="Document number")
+    document_date: Optional[datetime] = Field(default=None, description="Document date")
+    document_total: Optional[float] = Field(default=None, description="Document total")
     created_at: Optional[datetime] = Field(default=None, description="Creation date")
-    updated_at: Optional[datetime] = Field(default=None, description="Last update date")
 
 
-class EventListParams(PaginationParams, DateRangeParams):
-    """Parameters for listing events."""
+class LeadDocumentListParams(PaginationParams):
+    """Parameters for listing lead documents."""
     
-    lead_id: Optional[str] = Field(default=None, description="Filter by lead ID")
-    contact_id: Optional[str] = Field(default=None, description="Filter by contact ID")
-    attendee_id: Optional[str] = Field(default=None, description="Filter by attendee ID")
-    query: Optional[str] = Field(default=None, description="Search query")
+    document_type: Optional[str] = Field(default=None, description="Filter by document type")
 
 
-class BookingLocationCreate(BaseModel):
-    """Model for creating a booking location."""
+class LeadStageUpdate(BaseModel):
+    """Model for updating a lead stage."""
     
-    name: str = Field(..., description="Location name")
-    description: Optional[str] = Field(default=None, description="Location description")
-    address: Optional[str] = Field(default=None, description="Location address")
-    capacity: Optional[int] = Field(default=None, description="Location capacity")
-    availability: Optional[Dict[str, List[str]]] = Field(default=None, description="Location availability by day of week")
+    stage: str = Field(..., description="New stage")
+    reason: Optional[str] = Field(default=None, description="Reason for the stage change")
 
 
-class BookingLocationUpdate(BaseModel):
-    """Model for updating a booking location."""
+class LeadConvertParams(BaseModel):
+    """Parameters for converting a lead to a customer."""
     
-    name: Optional[str] = Field(default=None, description="Location name")
-    description: Optional[str] = Field(default=None, description="Location description")
-    address: Optional[str] = Field(default=None, description="Location address")
-    capacity: Optional[int] = Field(default=None, description="Location capacity")
-    availability: Optional[Dict[str, List[str]]] = Field(default=None, description="Location availability by day of week")
-
-
-class BookingLocation(BookingLocationCreate):
-    """Booking location model."""
-    
-    id: str = Field(..., description="Location ID")
-    created_at: Optional[datetime] = Field(default=None, description="Creation date")
-    updated_at: Optional[datetime] = Field(default=None, description="Last update date")
-
-
-class BookingSlot(BaseModel):
-    """Booking slot model."""
-    
-    date: datetime = Field(..., description="Slot date")
-    start_time: str = Field(..., description="Slot start time")
-    end_time: str = Field(..., description="Slot end time")
-    available: bool = Field(..., description="Whether the slot is available")
-
-
-class BookingCreate(BaseModel):
-    """Model for creating a booking."""
-    
-    location_id: str = Field(..., description="Location ID")
-    date: datetime = Field(..., description="Booking date")
-    start_time: str = Field(..., description="Booking start time")
-    end_time: str = Field(..., description="Booking end time")
-    title: str = Field(..., description="Booking title")
-    description: Optional[str] = Field(default=None, description="Booking description")
-    attendees: Optional[List[str]] = Field(default=None, description="Booking attendees (user IDs)")
-    lead_id: Optional[str] = Field(default=None, description="Related lead ID")
-    contact_id: Optional[str] = Field(default=None, description="Related contact ID")
-    custom_fields: Optional[Dict[str, Any]] = Field(default=None, description="Custom fields")
-
-
-class BookingUpdate(BaseModel):
-    """Model for updating a booking."""
-    
-    location_id: Optional[str] = Field(default=None, description="Location ID")
-    date: Optional[datetime] = Field(default=None, description="Booking date")
-    start_time: Optional[str] = Field(default=None, description="Booking start time")
-    end_time: Optional[str] = Field(default=None, description="Booking end time")
-    title: Optional[str] = Field(default=None, description="Booking title")
-    description: Optional[str] = Field(default=None, description="Booking description")
-    attendees: Optional[List[str]] = Field(default=None, description="Booking attendees (user IDs)")
-    lead_id: Optional[str] = Field(default=None, description="Related lead ID")
-    contact_id: Optional[str] = Field(default=None, description="Related contact ID")
-    custom_fields: Optional[Dict[str, Any]] = Field(default=None, description="Custom fields")
-
-
-class Booking(BookingCreate):
-    """Booking model."""
-    
-    id: str = Field(..., description="Booking ID")
-    created_at: Optional[datetime] = Field(default=None, description="Creation date")
-    updated_at: Optional[datetime] = Field(default=None, description="Last update date")
-
-
-class BookingListParams(PaginationParams, DateRangeParams):
-    """Parameters for listing bookings."""
-    
-    location_id: Optional[str] = Field(default=None, description="Filter by location ID")
-    lead_id: Optional[str] = Field(default=None, description="Filter by lead ID")
-    contact_id: Optional[str] = Field(default=None, description="Filter by contact ID")
-    attendee_id: Optional[str] = Field(default=None, description="Filter by attendee ID")
-    query: Optional[str] = Field(default=None, description="Search query")
+    document_type: Optional[str] = Field(default="invoice", description="Document type to create")
+    create_document: Optional[bool] = Field(default=False, description="Whether to create a document")
 
 
 # Response models
-class FunnelResponse(BaseResponse, Funnel):
+class FunnelResponse(BaseResponse):
     """Response model for a single funnel."""
-    pass
+    
+    funnel: Funnel = Field(..., description="Funnel data")
 
 
 class FunnelListResponse(BaseResponse):
@@ -260,9 +314,10 @@ class FunnelListResponse(BaseResponse):
     limit: Optional[int] = Field(default=None, description="Items per page")
 
 
-class LeadResponse(BaseResponse, Lead):
+class LeadResponse(BaseResponse):
     """Response model for a single lead."""
-    pass
+    
+    lead: Lead = Field(..., description="Lead data")
 
 
 class LeadListResponse(BaseResponse):
@@ -274,9 +329,10 @@ class LeadListResponse(BaseResponse):
     limit: Optional[int] = Field(default=None, description="Items per page")
 
 
-class LeadNoteResponse(BaseResponse, LeadNote):
+class LeadNoteResponse(BaseResponse):
     """Response model for a single lead note."""
-    pass
+    
+    note: LeadNote = Field(..., description="Note data")
 
 
 class LeadNoteListResponse(BaseResponse):
@@ -284,11 +340,14 @@ class LeadNoteListResponse(BaseResponse):
     
     items: List[LeadNote] = Field(..., description="List of notes")
     total: Optional[int] = Field(default=None, description="Total number of notes")
+    page: Optional[int] = Field(default=None, description="Current page")
+    limit: Optional[int] = Field(default=None, description="Items per page")
 
 
-class LeadTaskResponse(BaseResponse, LeadTask):
+class LeadTaskResponse(BaseResponse):
     """Response model for a single lead task."""
-    pass
+    
+    task: LeadTask = Field(..., description="Task data")
 
 
 class LeadTaskListResponse(BaseResponse):
@@ -296,52 +355,28 @@ class LeadTaskListResponse(BaseResponse):
     
     items: List[LeadTask] = Field(..., description="List of tasks")
     total: Optional[int] = Field(default=None, description="Total number of tasks")
-
-
-class EventResponse(BaseResponse, Event):
-    """Response model for a single event."""
-    pass
-
-
-class EventListResponse(BaseResponse):
-    """Response model for a list of events."""
-    
-    items: List[Event] = Field(..., description="List of events")
-    total: Optional[int] = Field(default=None, description="Total number of events")
     page: Optional[int] = Field(default=None, description="Current page")
     limit: Optional[int] = Field(default=None, description="Items per page")
 
 
-class BookingLocationResponse(BaseResponse, BookingLocation):
-    """Response model for a single booking location."""
-    pass
-
-
-class BookingLocationListResponse(BaseResponse):
-    """Response model for a list of booking locations."""
+class LeadDocumentResponse(BaseResponse):
+    """Response model for a single lead document."""
     
-    items: List[BookingLocation] = Field(..., description="List of booking locations")
-    total: Optional[int] = Field(default=None, description="Total number of booking locations")
+    document: LeadDocument = Field(..., description="Document link data")
+
+
+class LeadDocumentListResponse(BaseResponse):
+    """Response model for a list of lead documents."""
+    
+    items: List[LeadDocument] = Field(..., description="List of document links")
+    total: Optional[int] = Field(default=None, description="Total number of document links")
     page: Optional[int] = Field(default=None, description="Current page")
     limit: Optional[int] = Field(default=None, description="Items per page")
 
 
-class BookingSlotListResponse(BaseResponse):
-    """Response model for a list of booking slots."""
+class LeadConvertResponse(BaseResponse):
+    """Response model for converting a lead."""
     
-    items: List[BookingSlot] = Field(..., description="List of booking slots")
-    total: Optional[int] = Field(default=None, description="Total number of booking slots")
-
-
-class BookingResponse(BaseResponse, Booking):
-    """Response model for a single booking."""
-    pass
-
-
-class BookingListResponse(BaseResponse):
-    """Response model for a list of bookings."""
-    
-    items: List[Booking] = Field(..., description="List of bookings")
-    total: Optional[int] = Field(default=None, description="Total number of bookings")
-    page: Optional[int] = Field(default=None, description="Current page")
-    limit: Optional[int] = Field(default=None, description="Items per page") 
+    contact_id: Optional[str] = Field(default=None, description="Created or linked contact ID")
+    document_id: Optional[str] = Field(default=None, description="Created document ID")
+    message: Optional[str] = Field(default=None, description="Response message") 

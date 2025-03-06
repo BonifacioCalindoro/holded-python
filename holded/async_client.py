@@ -4,11 +4,12 @@ Asynchronous client for the Holded API.
 import json
 import logging
 import asyncio
-from typing import Any, Dict, Optional, TypeVar
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from urllib.parse import urljoin
 
 import aiohttp
 from aiohttp import ClientError, ClientTimeout
+from pydantic import BaseModel
 
 from .exceptions import (
     HoldedAPIError,
@@ -66,7 +67,8 @@ class AsyncHoldedClient:
             retry_delay: Delay between retries in seconds
         """
         self.api_key = api_key
-        self.base_url = urljoin(base_url, api_version + "/")
+        self.base_url = base_url
+        self.api_version = api_version
         self.timeout = timeout
         self.max_retries = max_retries
         self.retry_delay = retry_delay
@@ -107,29 +109,45 @@ class AsyncHoldedClient:
             )
         return self.session
 
-    def _build_url(self, resource: str, endpoint: str, resource_id: Optional[str] = None) -> str:
+    def _build_url(self, path: str) -> str:
         """
         Build the URL for the API request.
 
         Args:
-            resource: The API resource (e.g., 'invoicing', 'accounting')
-            endpoint: The endpoint (e.g., 'contacts', 'documents')
-            resource_id: Optional resource ID for specific resource operations
+            path: The API path (e.g., 'invoicing/documents')
 
         Returns:
-            The complete URL for the API request
+            The full URL.
         """
-        url = f"{self.base_url}/{resource}"
-        if resource_id:
-            url = f"{url}/{resource_id}"
-        return url
+        values = path.split("/")
+        service = values[0]
+        endpoint = values[1]
+        extra = values[2:]
+        return urljoin(self.base_url, service + "/" + self.api_version + "/" + endpoint + "/" + "/".join(extra))
 
-    async def _handle_response(self, response: aiohttp.ClientResponse) -> Any:
+    def _serialize_data(self, data: Union[Dict[str, Any], BaseModel]) -> Dict[str, Any]:
+        """
+        Serialize data for a request.
+
+        Args:
+            data: The data to serialize.
+
+        Returns:
+            The serialized data.
+        """
+        if isinstance(data, BaseModel):
+            return data.model_dump(exclude_none=True)
+        return data
+
+    async def _handle_response(
+        self, response: aiohttp.ClientResponse, response_model: Optional[Type[T]] = None
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], T]:
         """
         Handle the API response and raise appropriate exceptions.
 
         Args:
             response: The aiohttp ClientResponse object
+            response_model: Optional Pydantic model to deserialize to
 
         Returns:
             The parsed JSON response
@@ -142,51 +160,57 @@ class AsyncHoldedClient:
             HoldedServerError: When there's a server error
             HoldedAPIError: For other API errors
         """
+        status_code = response.status
+        content_type = response.headers.get("Content-Type", "")
+
         try:
-            if response.content_length and response.content_length > 0:
-                response_json = await response.json()
+            if "application/json" in content_type:
+                data = await response.json()
             else:
-                response_json = {}
-        except json.JSONDecodeError:
-            response_json = {}
+                text = await response.text()
+                try:
+                    data = json.loads(text)
+                except json.JSONDecodeError:
+                    data = {"message": text}
+        except Exception as e:
+            raise HoldedAPIError(f"Failed to parse response: {str(e)}", status_code=status_code)
 
-        if 200 <= response.status < 300:
-            return response_json
+        if status_code >= 400:
+            error_message = data.get("message", str(data))
+            if status_code == 401:
+                raise HoldedAuthError(error_message, status_code=status_code, error_data=data)
+            elif status_code == 404:
+                raise HoldedNotFoundError(error_message, status_code=status_code, error_data=data)
+            elif status_code == 422:
+                raise HoldedValidationError(error_message, status_code=status_code, error_data=data)
+            elif status_code == 429:
+                raise HoldedRateLimitError(error_message, status_code=status_code, error_data=data)
+            elif status_code >= 500:
+                raise HoldedServerError(error_message, status_code=status_code, error_data=data)
+            else:
+                raise HoldedAPIError(error_message, status_code=status_code, error_data=data)
 
-        error_message = response_json.get("message", "Unknown error")
-
-        if response.status == 401:
-            raise HoldedAuthError(response.status, response_json, error_message)
-        elif response.status == 404:
-            raise HoldedNotFoundError(response.status, response_json, error_message)
-        elif response.status == 422:
-            raise HoldedValidationError(response.status, response_json, error_message)
-        elif response.status == 429:
-            raise HoldedRateLimitError(response.status, response_json, error_message)
-        elif 500 <= response.status < 600:
-            raise HoldedServerError(response.status, response_json, error_message)
-        else:
-            raise HoldedAPIError(response.status, response_json, error_message)
+        if response_model is not None:
+            return response_model.model_validate(data)
+        return data
 
     async def request(
         self,
         method: str,
-        resource: str,
-        endpoint: str,
-        resource_id: Optional[str] = None,
+        path: str,
         params: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any]] = None,
-    ) -> Any:
+        data: Optional[Union[Dict[str, Any], BaseModel]] = None,
+        response_model: Optional[Type[T]] = None,
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], T]:
         """
         Make an asynchronous request to the Holded API.
 
         Args:
             method: HTTP method (GET, POST, PUT, DELETE)
-            resource: API resource (e.g., 'invoicing', 'accounting')
-            endpoint: API endpoint (e.g., 'contacts', 'documents')
-            resource_id: Optional resource ID for specific resource operations
+            path: API path (e.g., 'invoicing/documents')
             params: Optional query parameters
             data: Optional request body data
+            response_model: Optional Pydantic model to deserialize to
 
         Returns:
             The parsed JSON response
@@ -196,114 +220,120 @@ class AsyncHoldedClient:
             HoldedConnectionError: When there's a connection error
             Various HoldedAPIError subclasses for API errors
         """
-        url = self._build_url(resource, endpoint, resource_id)
+        url = self._build_url(path)
         session = await self._get_session()
         
-        try:
-            async with session.request(
-                method=method,
-                url=url,
-                params=params,
-                json=data,
-                ssl=True,
-            ) as response:
-                return await self._handle_response(response)
-        except aiohttp.ClientResponseError as e:
-            raise HoldedAPIError(e.status, {}, str(e))
-        except asyncio.TimeoutError:
-            raise HoldedTimeoutError(f"Request timed out after {self.timeout} seconds")
-        except ClientError as e:
-            raise HoldedConnectionError(f"Connection error: {str(e)}")
-        except Exception as e:
-            if isinstance(e, HoldedError):
+        if data is not None:
+            data = self._serialize_data(data)
+
+        for attempt in range(self.max_retries):
+            try:
+                async with session.request(
+                    method=method,
+                    url=url,
+                    params=params,
+                    json=data,
+                    ssl=True,
+                ) as response:
+                    return await self._handle_response(response, response_model)
+            except (HoldedRateLimitError, HoldedServerError) as e:
+                if attempt < self.max_retries - 1:
+                    wait_time = self.retry_delay * (2 ** attempt)
+                    logger.warning(
+                        f"Request failed with {e.__class__.__name__}. "
+                        f"Retrying in {wait_time} seconds..."
+                    )
+                    await asyncio.sleep(wait_time)
+                else:
+                    raise
+            except aiohttp.ClientConnectorError as e:
+                raise HoldedConnectionError(f"Connection error: {str(e)}")
+            except asyncio.TimeoutError:
+                raise HoldedTimeoutError("Request timed out")
+            except HoldedError:
                 raise
-            raise HoldedError(message=f"Unexpected error: {str(e)}") from e
+            except Exception as e:
+                raise HoldedError(f"Unexpected error: {str(e)}")
 
     async def get(
         self,
-        resource: str,
-        endpoint: str,
-        resource_id: Optional[str] = None,
+        path: str,
         params: Optional[Dict[str, Any]] = None,
-    ) -> Any:
+        response_model: Optional[Type[T]] = None,
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], T]:
         """
         Make an asynchronous GET request to the Holded API.
 
         Args:
-            resource: API resource (e.g., 'invoicing', 'accounting')
-            endpoint: API endpoint (e.g., 'contacts', 'documents')
-            resource_id: Optional resource ID for specific resource operations
+            path: API path (e.g., 'invoicing/documents')
             params: Optional query parameters
+            response_model: Optional Pydantic model to deserialize to
 
         Returns:
             The parsed JSON response
         """
-        return await self.request("GET", resource, endpoint, resource_id, params)
+        return await self.request("GET", path, params=params, response_model=response_model)
 
     async def post(
         self,
-        resource: str,
-        endpoint: str,
-        data: Dict[str, Any],
+        path: str,
+        data: Optional[Union[Dict[str, Any], BaseModel]] = None,
         params: Optional[Dict[str, Any]] = None,
-    ) -> Any:
+        response_model: Optional[Type[T]] = None,
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], T]:
         """
         Make an asynchronous POST request to the Holded API.
 
         Args:
-            resource: API resource (e.g., 'invoicing', 'accounting')
-            endpoint: API endpoint (e.g., 'contacts', 'documents')
+            path: API path (e.g., 'invoicing/documents')
             data: Request body data
             params: Optional query parameters
+            response_model: Optional Pydantic model to deserialize to
 
         Returns:
             The parsed JSON response
         """
-        return await self.request("POST", resource, endpoint, None, params, data)
+        return await self.request("POST", path, params=params, data=data, response_model=response_model)
 
     async def put(
         self,
-        resource: str,
-        endpoint: str,
-        resource_id: str,
-        data: Dict[str, Any],
+        path: str,
+        data: Optional[Union[Dict[str, Any], BaseModel]] = None,
         params: Optional[Dict[str, Any]] = None,
-    ) -> Any:
+        response_model: Optional[Type[T]] = None,
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], T]:
         """
         Make an asynchronous PUT request to the Holded API.
 
         Args:
-            resource: API resource (e.g., 'invoicing', 'accounting')
-            endpoint: API endpoint (e.g., 'contacts', 'documents')
-            resource_id: Resource ID for the specific resource
+            path: API path (e.g., 'invoicing/documents')
             data: Request body data
             params: Optional query parameters
+            response_model: Optional Pydantic model to deserialize to
 
         Returns:
             The parsed JSON response
         """
-        return await self.request("PUT", resource, endpoint, resource_id, params, data)
+        return await self.request("PUT", path, params=params, data=data, response_model=response_model)
 
     async def delete(
         self,
-        resource: str,
-        endpoint: str,
-        resource_id: str,
+        path: str,
         params: Optional[Dict[str, Any]] = None,
-    ) -> Any:
+        response_model: Optional[Type[T]] = None,
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], T]:
         """
         Make an asynchronous DELETE request to the Holded API.
 
         Args:
-            resource: API resource (e.g., 'invoicing', 'accounting')
-            endpoint: API endpoint (e.g., 'contacts', 'documents')
-            resource_id: Resource ID for the specific resource
+            path: API path (e.g., 'invoicing/documents')
             params: Optional query parameters
+            response_model: Optional Pydantic model to deserialize to
 
         Returns:
             The parsed JSON response
         """
-        return await self.request("DELETE", resource, endpoint, resource_id, params)
+        return await self.request("DELETE", path, params=params, response_model=response_model)
 
     async def close(self) -> None:
         """

@@ -16,378 +16,301 @@ class CRMResource(BaseResource):
         List all funnels.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of funnels
+            A list of funnels.
         """
-        return cast(List[Dict[str, Any]], self.client.get("crm", "funnels", params=params))
+        return cast(List[Dict[str, Any]], self.client.get("crm/funnels", params=params))
 
     def create_funnel(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new funnel.
 
         Args:
-            data: Funnel data
+            data: Funnel data.
 
         Returns:
-            The created funnel
+            The created funnel.
         """
-        return cast(Dict[str, Any], self.client.post("crm", "funnels", data))
+        return cast(Dict[str, Any], self.client.post("crm/funnels", data=data))
 
     def get_funnel(self, funnel_id: str) -> Dict[str, Any]:
         """
         Get a specific funnel.
 
         Args:
-            funnel_id: The funnel ID
+            funnel_id: The funnel ID.
 
         Returns:
-            The funnel details
+            The funnel.
         """
-        return cast(Dict[str, Any], self.client.get("crm", "funnels", funnel_id))
+        return cast(Dict[str, Any], self.client.get(f"crm/funnels/{funnel_id}"))
 
     def update_funnel(self, funnel_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update a funnel.
 
         Args:
-            funnel_id: The funnel ID
-            data: Updated funnel data
+            funnel_id: The funnel ID.
+            data: Updated funnel data.
 
         Returns:
-            The updated funnel
+            The updated funnel.
         """
-        return cast(Dict[str, Any], self.client.put("crm", "funnels", funnel_id, data))
+        return cast(Dict[str, Any], self.client.put(f"crm/funnels/{funnel_id}", data=data))
 
     def delete_funnel(self, funnel_id: str) -> Dict[str, Any]:
         """
         Delete a funnel.
 
         Args:
-            funnel_id: The funnel ID
+            funnel_id: The funnel ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        return cast(Dict[str, Any], self.client.delete("crm", "funnels", funnel_id))
+        return cast(Dict[str, Any], self.client.delete(f"crm/funnels/{funnel_id}"))
 
     def list_leads(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all leads.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of leads
+            A list of leads.
         """
-        return cast(List[Dict[str, Any]], self.client.get("crm", "leads", params=params))
+        return cast(List[Dict[str, Any]], self.client.get("crm/leads", params=params))
 
     def create_lead(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new lead.
 
         Args:
-            data: Lead data
+            data: Lead data.
 
         Returns:
-            The created lead
+            The created lead.
         """
-        return cast(Dict[str, Any], self.client.post("crm", "leads", data))
+        return cast(Dict[str, Any], self.client.post("crm/leads", data=data))
 
     def get_lead(self, lead_id: str) -> Dict[str, Any]:
         """
         Get a specific lead.
 
         Args:
-            lead_id: The lead ID
+            lead_id: The lead ID.
 
         Returns:
-            The lead details
+            The lead.
         """
-        return cast(Dict[str, Any], self.client.get("crm", "leads", lead_id))
+        return cast(Dict[str, Any], self.client.get(f"crm/leads/{lead_id}"))
 
     def update_lead(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update a lead.
 
         Args:
-            lead_id: The lead ID
-            data: Updated lead data
+            lead_id: The lead ID.
+            data: Updated lead data.
 
         Returns:
-            The updated lead
+            The updated lead.
         """
-        return cast(Dict[str, Any], self.client.put("crm", "leads", lead_id, data))
+        return cast(Dict[str, Any], self.client.put(f"crm/leads/{lead_id}", data=data))
 
     def delete_lead(self, lead_id: str) -> Dict[str, Any]:
         """
         Delete a lead.
 
         Args:
-            lead_id: The lead ID
+            lead_id: The lead ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        return cast(Dict[str, Any], self.client.delete("crm", "leads", lead_id))
+        return cast(Dict[str, Any], self.client.delete(f"crm/leads/{lead_id}"))
 
-    def create_lead_note(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def add_lead_note(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Create a note for a lead.
+        Add a note to a lead.
 
         Args:
-            lead_id: The lead ID
-            data: Note data
+            lead_id: The lead ID.
+            data: Note data.
 
         Returns:
-            The created note
+            The created note.
         """
-        return cast(
-            Dict[str, Any],
-            self.client.post("crm", f"leads/{lead_id}/notes", data)
-        )
+        return cast(Dict[str, Any], self.client.post(f"crm/leads/{lead_id}/notes", data=data))
 
-    def update_lead_note(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def add_lead_task(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Update a note for a lead.
+        Add a task to a lead.
 
         Args:
-            lead_id: The lead ID
-            data: Updated note data
+            lead_id: The lead ID.
+            data: Task data.
 
         Returns:
-            The updated note
+            The created task.
         """
-        return cast(
-            Dict[str, Any],
-            self.client.put("crm", f"leads/{lead_id}/notes", data)
-        )
+        return cast(Dict[str, Any], self.client.post(f"crm/leads/{lead_id}/tasks", data=data))
 
-    def create_lead_task(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def update_lead_stage(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Create a task for a lead.
+        Update the stage of a lead.
 
         Args:
-            lead_id: The lead ID
-            data: Task data
+            lead_id: The lead ID.
+            data: Stage data.
 
         Returns:
-            The created task
+            The updated lead.
         """
-        return cast(
-            Dict[str, Any],
-            self.client.post("crm", f"leads/{lead_id}/tasks", data)
-        )
-
-    def update_lead_task(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Update a task for a lead.
-
-        Args:
-            lead_id: The lead ID
-            data: Updated task data
-
-        Returns:
-            The updated task
-        """
-        return cast(
-            Dict[str, Any],
-            self.client.put("crm", f"leads/{lead_id}/tasks", data)
-        )
-
-    def delete_lead_task(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Delete a task for a lead.
-
-        Args:
-            lead_id: The lead ID
-            data: Task deletion data
-
-        Returns:
-            The deletion response
-        """
-        return cast(
-            Dict[str, Any],
-            self.client.delete("crm", f"leads/{lead_id}/tasks", data)
-        )
-
-    def update_lead_dates(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Update dates for a lead.
-
-        Args:
-            lead_id: The lead ID
-            data: Updated dates data
-
-        Returns:
-            The updated lead dates
-        """
-        return cast(
-            Dict[str, Any],
-            self.client.put("crm", f"leads/{lead_id}/dates", data)
-        )
-
-    def update_lead_stages(self, lead_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Update stages for a lead.
-
-        Args:
-            lead_id: The lead ID
-            data: Updated stages data
-
-        Returns:
-            The updated lead stages
-        """
-        return cast(
-            Dict[str, Any],
-            self.client.put("crm", f"leads/{lead_id}/stages", data)
-        )
+        return cast(Dict[str, Any], self.client.post(f"crm/leads/{lead_id}/stage", data=data))
 
     def list_events(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all events.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of events
+            A list of events.
         """
-        return cast(List[Dict[str, Any]], self.client.get("crm", "events", params=params))
+        return cast(List[Dict[str, Any]], self.client.get("crm/events", params=params))
 
     def create_event(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new event.
 
         Args:
-            data: Event data
+            data: Event data.
 
         Returns:
-            The created event
+            The created event.
         """
-        return cast(Dict[str, Any], self.client.post("crm", "events", data))
+        return cast(Dict[str, Any], self.client.post("crm/events", data=data))
 
     def get_event(self, event_id: str) -> Dict[str, Any]:
         """
         Get a specific event.
 
         Args:
-            event_id: The event ID
+            event_id: The event ID.
 
         Returns:
-            The event details
+            The event.
         """
-        return cast(Dict[str, Any], self.client.get("crm", "events", event_id))
+        return cast(Dict[str, Any], self.client.get(f"crm/events/{event_id}"))
 
     def update_event(self, event_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update an event.
 
         Args:
-            event_id: The event ID
-            data: Updated event data
+            event_id: The event ID.
+            data: Updated event data.
 
         Returns:
-            The updated event
+            The updated event.
         """
-        return cast(Dict[str, Any], self.client.put("crm", "events", event_id, data))
+        return cast(Dict[str, Any], self.client.put(f"crm/events/{event_id}", data=data))
 
     def delete_event(self, event_id: str) -> Dict[str, Any]:
         """
         Delete an event.
 
         Args:
-            event_id: The event ID
+            event_id: The event ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        return cast(Dict[str, Any], self.client.delete("crm", "events", event_id))
+        return cast(Dict[str, Any], self.client.delete(f"crm/events/{event_id}"))
 
     def list_booking_locations(self) -> List[Dict[str, Any]]:
         """
         List all booking locations.
 
         Returns:
-            A list of booking locations
+            A list of booking locations.
         """
-        return cast(List[Dict[str, Any]], self.client.get("crm", "bookings/locations"))
+        return cast(List[Dict[str, Any]], self.client.get("crm/bookings/locations"))
 
-    def get_booking_location_slots(self, location_id: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    def create_booking_location(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Get slots for a specific booking location.
+        Create a new booking location.
 
         Args:
-            location_id: The location ID
-            params: Optional query parameters (e.g., date)
+            data: Booking location data.
 
         Returns:
-            A list of slots for the location
+            The created booking location.
         """
-        return cast(
-            List[Dict[str, Any]],
-            self.client.get("crm", f"bookings/locations/{location_id}/slots", params=params)
-        )
+        return cast(Dict[str, Any], self.client.post("crm/bookings/locations", data=data))
 
     def list_bookings(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all bookings.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of bookings
+            A list of bookings.
         """
-        return cast(List[Dict[str, Any]], self.client.get("crm", "bookings", params=params))
+        return cast(List[Dict[str, Any]], self.client.get("crm/bookings", params=params))
 
     def create_booking(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new booking.
 
         Args:
-            data: Booking data
+            data: Booking data.
 
         Returns:
-            The created booking
+            The created booking.
         """
-        return cast(Dict[str, Any], self.client.post("crm", "bookings", data))
+        return cast(Dict[str, Any], self.client.post("crm/bookings", data=data))
 
     def get_booking(self, booking_id: str) -> Dict[str, Any]:
         """
         Get a specific booking.
 
         Args:
-            booking_id: The booking ID
+            booking_id: The booking ID.
 
         Returns:
-            The booking details
+            The booking.
         """
-        return cast(Dict[str, Any], self.client.get("crm", "bookings", booking_id))
+        return cast(Dict[str, Any], self.client.get(f"crm/bookings/{booking_id}"))
 
     def update_booking(self, booking_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update a booking.
 
         Args:
-            booking_id: The booking ID
-            data: Updated booking data
+            booking_id: The booking ID.
+            data: Updated booking data.
 
         Returns:
-            The updated booking
+            The updated booking.
         """
-        return cast(Dict[str, Any], self.client.put("crm", "bookings", booking_id, data))
+        return cast(Dict[str, Any], self.client.put(f"crm/bookings/{booking_id}", data=data))
 
     def delete_booking(self, booking_id: str) -> Dict[str, Any]:
         """
         Delete a booking.
 
         Args:
-            booking_id: The booking ID
+            booking_id: The booking ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        return cast(Dict[str, Any], self.client.delete("crm", "bookings", booking_id)) 
+        return cast(Dict[str, Any], self.client.delete(f"crm/bookings/{booking_id}")) 

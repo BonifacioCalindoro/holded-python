@@ -11,17 +11,18 @@ class DocumentsResource(BaseResource):
     Resource for interacting with the Documents API.
     """
 
-    def list(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    def list(self, docType: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all documents.
 
         Args:
+            docType: The document type
             params: Optional query parameters (e.g., page, limit, type)
 
         Returns:
             A list of documents
         """
-        return cast(List[Dict[str, Any]], self.client.get("invoicing", "documents", params=params))
+        return cast(List[Dict[str, Any]], self.client.get(f"invoicing/documents/{docType}", params=params))
 
     def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -33,7 +34,7 @@ class DocumentsResource(BaseResource):
         Returns:
             The created document
         """
-        return cast(Dict[str, Any], self.client.post("invoicing", "documents", data))
+        return cast(Dict[str, Any], self.client.post("invoicing/documents", data=data))
 
     def get(self, document_id: str) -> Dict[str, Any]:
         """
@@ -45,7 +46,7 @@ class DocumentsResource(BaseResource):
         Returns:
             The document details
         """
-        return cast(Dict[str, Any], self.client.get("invoicing", "documents", document_id))
+        return cast(Dict[str, Any], self.client.get(f"invoicing/documents/{document_id}"))
 
     def update(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -58,7 +59,7 @@ class DocumentsResource(BaseResource):
         Returns:
             The updated document
         """
-        return cast(Dict[str, Any], self.client.put("invoicing", "documents", document_id, data))
+        return cast(Dict[str, Any], self.client.put(f"invoicing/documents/{document_id}", data=data))
 
     def delete(self, document_id: str) -> Dict[str, Any]:
         """
@@ -70,7 +71,7 @@ class DocumentsResource(BaseResource):
         Returns:
             The deletion response
         """
-        return cast(Dict[str, Any], self.client.delete("invoicing", "documents", document_id))
+        return cast(Dict[str, Any], self.client.delete(f"invoicing/documents/{document_id}"))
 
     def pay(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -85,7 +86,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.post("invoicing", f"documents/{document_id}/pay", data)
+            self.client.post(f"invoicing/documents/{document_id}/pay", data=data)
         )
 
     def send(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -101,7 +102,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.post("invoicing", f"documents/{document_id}/send", data)
+            self.client.post(f"invoicing/documents/{document_id}/send", data=data)
         )
 
     def get_pdf(self, document_id: str) -> Dict[str, Any]:
@@ -116,7 +117,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.get("invoicing", f"documents/{document_id}/pdf")
+            self.client.get(f"invoicing/documents/{document_id}/pdf")
         )
 
     def ship_all_items(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -132,7 +133,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.post("invoicing", f"documents/{document_id}/shipall", data)
+            self.client.post(f"invoicing/documents/{document_id}/shipall", data=data)
         )
 
     def ship_items_by_line(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -148,7 +149,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.post("invoicing", f"documents/{document_id}/shipline", data)
+            self.client.post(f"invoicing/documents/{document_id}/shipline", data=data)
         )
 
     def get_shipped_units(self, document_id: str, item_id: str) -> Dict[str, Any]:
@@ -164,7 +165,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.get("invoicing", f"documents/{document_id}/shipped/{item_id}")
+            self.client.get(f"invoicing/documents/{document_id}/shipped/{item_id}")
         )
 
     def attach_file(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -180,7 +181,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.post("invoicing", f"documents/{document_id}/attach", data)
+            self.client.post(f"invoicing/documents/{document_id}/attach", data=data)
         )
 
     def update_tracking(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -196,7 +197,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.post("invoicing", f"documents/{document_id}/tracking", data)
+            self.client.post(f"invoicing/documents/{document_id}/tracking", data=data)
         )
 
     def update_pipeline(self, document_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -212,7 +213,7 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             Dict[str, Any],
-            self.client.post("invoicing", f"documents/{document_id}/pipeline", data)
+            self.client.post(f"invoicing/documents/{document_id}/pipeline", data=data)
         )
 
     def list_payment_methods(self) -> List[Dict[str, Any]]:
@@ -224,5 +225,5 @@ class DocumentsResource(BaseResource):
         """
         return cast(
             List[Dict[str, Any]],
-            self.client.get("invoicing", "paymentmethods")
+            self.client.get("invoicing/paymentmethods")
         ) 

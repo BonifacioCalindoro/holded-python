@@ -18,7 +18,7 @@ requirements = [
 
 setup(
     name="holded-python",
-    version="0.1.1",
+    version="0.1.2",
     author="BonifacioCalindoro",
     author_email="marcos@marcosgimenez.tech",
     description="A comprehensive Python wrapper for the Holded API",
@@ -27,7 +27,7 @@ setup(
     url="https://github.com/BonifacioCalindoro/holded-python",
     packages=find_packages(include=["holded", "holded.*"]),
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",

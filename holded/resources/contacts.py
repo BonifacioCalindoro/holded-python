@@ -20,7 +20,7 @@ class ContactsResource:
             client: The Holded client instance.
         """
         self.client = client
-        self.base_path = "/contacts"
+        self.base_path = "invoicing/contacts"
 
     def list(self, params: Optional[Union[Dict[str, Any], ContactListParams]] = None) -> ContactListResponse:
         """List all contacts.
@@ -57,6 +57,7 @@ class ContactsResource:
         Returns:
             The contact.
         """
+        print(f"{self.base_path}/{contact_id}")
         return self.client.get(f"{self.base_path}/{contact_id}")
 
     def update(self, contact_id: str, data: Union[Dict[str, Any], ContactUpdate]) -> ContactResponse:

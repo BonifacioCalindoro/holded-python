@@ -11,17 +11,26 @@ class AsyncTreasuryResource(AsyncBaseResource):
     Resource for interacting with the Treasury API asynchronously.
     """
 
+    def __init__(self, client):
+        """Initialize the treasury resource.
+
+        Args:
+            client: The Holded async client instance.
+        """
+        self.client = client
+        self.base_path = "treasury"
+
     async def list_accounts(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         List all treasury accounts asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of treasury accounts
+            A list of treasury accounts.
         """
-        result = await self.client.get("treasury", "accounts", params=params)
+        result = await self.client.get(f"{self.base_path}/accounts", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_account(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -29,12 +38,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Create a new treasury account asynchronously.
 
         Args:
-            data: Account data
+            data: Treasury account data.
 
         Returns:
-            The created treasury account
+            The created treasury account.
         """
-        result = await self.client.post("treasury", "accounts", data)
+        result = await self.client.post(f"{self.base_path}/accounts", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_account(self, account_id: str) -> Dict[str, Any]:
@@ -42,12 +51,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Get a specific treasury account asynchronously.
 
         Args:
-            account_id: The account ID
+            account_id: The treasury account ID.
 
         Returns:
-            The treasury account details
+            The treasury account.
         """
-        result = await self.client.get("treasury", "accounts", account_id)
+        result = await self.client.get(f"{self.base_path}/accounts/{account_id}")
         return cast(Dict[str, Any], result)
 
     async def update_account(self, account_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -55,13 +64,13 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Update a treasury account asynchronously.
 
         Args:
-            account_id: The account ID
-            data: Updated account data
+            account_id: The treasury account ID.
+            data: Updated treasury account data.
 
         Returns:
-            The updated treasury account
+            The updated treasury account.
         """
-        result = await self.client.put("treasury", "accounts", account_id, data)
+        result = await self.client.put(f"{self.base_path}/accounts/{account_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete_account(self, account_id: str) -> Dict[str, Any]:
@@ -69,12 +78,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Delete a treasury account asynchronously.
 
         Args:
-            account_id: The account ID
+            account_id: The treasury account ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("treasury", "accounts", account_id)
+        result = await self.client.delete(f"{self.base_path}/accounts/{account_id}")
         return cast(Dict[str, Any], result)
 
     async def list_transactions(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -82,12 +91,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         List all treasury transactions asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of treasury transactions
+            A list of treasury transactions.
         """
-        result = await self.client.get("treasury", "transactions", params=params)
+        result = await self.client.get(f"{self.base_path}/transactions", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_transaction(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -95,12 +104,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Create a new treasury transaction asynchronously.
 
         Args:
-            data: Transaction data
+            data: Treasury transaction data.
 
         Returns:
-            The created treasury transaction
+            The created treasury transaction.
         """
-        result = await self.client.post("treasury", "transactions", data)
+        result = await self.client.post(f"{self.base_path}/transactions", data=data)
         return cast(Dict[str, Any], result)
 
     async def get_transaction(self, transaction_id: str) -> Dict[str, Any]:
@@ -108,12 +117,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Get a specific treasury transaction asynchronously.
 
         Args:
-            transaction_id: The transaction ID
+            transaction_id: The treasury transaction ID.
 
         Returns:
-            The treasury transaction details
+            The treasury transaction.
         """
-        result = await self.client.get("treasury", "transactions", transaction_id)
+        result = await self.client.get(f"{self.base_path}/transactions/{transaction_id}")
         return cast(Dict[str, Any], result)
 
     async def update_transaction(self, transaction_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -121,13 +130,13 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Update a treasury transaction asynchronously.
 
         Args:
-            transaction_id: The transaction ID
-            data: Updated transaction data
+            transaction_id: The treasury transaction ID.
+            data: Updated treasury transaction data.
 
         Returns:
-            The updated treasury transaction
+            The updated treasury transaction.
         """
-        result = await self.client.put("treasury", "transactions", transaction_id, data)
+        result = await self.client.put(f"{self.base_path}/transactions/{transaction_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete_transaction(self, transaction_id: str) -> Dict[str, Any]:
@@ -135,40 +144,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Delete a treasury transaction asynchronously.
 
         Args:
-            transaction_id: The transaction ID
+            transaction_id: The treasury transaction ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("treasury", "transactions", transaction_id)
-        return cast(Dict[str, Any], result)
-
-    async def list_account_transactions(self, account_id: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
-        """
-        List all transactions for a specific treasury account asynchronously.
-
-        Args:
-            account_id: The account ID
-            params: Optional query parameters (e.g., page, limit)
-
-        Returns:
-            A list of transactions for the account
-        """
-        result = await self.client.get("treasury", f"accounts/{account_id}/transactions", params=params)
-        return cast(List[Dict[str, Any]], result)
-
-    async def create_account_transaction(self, account_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Create a new transaction for a specific treasury account asynchronously.
-
-        Args:
-            account_id: The account ID
-            data: Transaction data
-
-        Returns:
-            The created transaction
-        """
-        result = await self.client.post("treasury", f"accounts/{account_id}/transactions", data)
+        result = await self.client.delete(f"{self.base_path}/transactions/{transaction_id}")
         return cast(Dict[str, Any], result)
 
     async def reconcile_transaction(self, transaction_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -176,13 +157,13 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Reconcile a treasury transaction asynchronously.
 
         Args:
-            transaction_id: The transaction ID
-            data: Reconciliation data
+            transaction_id: The treasury transaction ID.
+            data: Reconciliation data.
 
         Returns:
-            The reconciled transaction
+            The reconciled treasury transaction.
         """
-        result = await self.client.put("treasury", f"transactions/{transaction_id}/reconcile", data)
+        result = await self.client.post(f"{self.base_path}/transactions/{transaction_id}/reconcile", data=data)
         return cast(Dict[str, Any], result)
 
     async def list_categories(self, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -190,12 +171,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         List all treasury categories asynchronously.
 
         Args:
-            params: Optional query parameters (e.g., page, limit)
+            params: Optional query parameters.
 
         Returns:
-            A list of treasury categories
+            A list of treasury categories.
         """
-        result = await self.client.get("treasury", "categories", params=params)
+        result = await self.client.get(f"{self.base_path}/categories", params=params)
         return cast(List[Dict[str, Any]], result)
 
     async def create_category(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -203,12 +184,12 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Create a new treasury category asynchronously.
 
         Args:
-            data: Category data
+            data: Treasury category data.
 
         Returns:
-            The created treasury category
+            The created treasury category.
         """
-        result = await self.client.post("treasury", "categories", data)
+        result = await self.client.post(f"{self.base_path}/categories", data=data)
         return cast(Dict[str, Any], result)
 
     async def update_category(self, category_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -216,13 +197,13 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Update a treasury category asynchronously.
 
         Args:
-            category_id: The category ID
-            data: Updated category data
+            category_id: The treasury category ID.
+            data: Updated treasury category data.
 
         Returns:
-            The updated treasury category
+            The updated treasury category.
         """
-        result = await self.client.put("treasury", "categories", category_id, data)
+        result = await self.client.put(f"{self.base_path}/categories/{category_id}", data=data)
         return cast(Dict[str, Any], result)
 
     async def delete_category(self, category_id: str) -> Dict[str, Any]:
@@ -230,10 +211,10 @@ class AsyncTreasuryResource(AsyncBaseResource):
         Delete a treasury category asynchronously.
 
         Args:
-            category_id: The category ID
+            category_id: The treasury category ID.
 
         Returns:
-            The deletion response
+            A confirmation message.
         """
-        result = await self.client.delete("treasury", "categories", category_id)
+        result = await self.client.delete(f"{self.base_path}/categories/{category_id}")
         return cast(Dict[str, Any], result)
