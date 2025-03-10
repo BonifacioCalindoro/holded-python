@@ -16,7 +16,7 @@ A comprehensive Python wrapper for the Holded API, providing a clean, type-safe 
 ## Installation
 
 ```bash
-pip install holded-api
+pip install holded-python
 ```
 
 ## Quick Start
