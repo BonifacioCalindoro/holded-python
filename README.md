@@ -1,4 +1,4 @@
-# Holded API Wrapper
+# Holded API Python Wrapper
 
 A comprehensive Python wrapper for the Holded API, providing a clean, type-safe interface for interacting with Holded's services.
 
