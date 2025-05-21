@@ -122,3 +122,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details. 
+
+## Funding
+
+## ☕ Sponsor Me
+
+If you like this project, consider [buying me OpenAI credits](https://buymeacoffee.com/bonifaciocalindoro)!
+
+[![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=☕&slug=bonifaciocalindoro&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff)](https://buymeacoffee.com/bonifaciocalindoro)
